@@ -3,1584 +3,1353 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Transporte Saúde - Diário de Bordo & Gestão Integrada</title>
+  <title>Transporte Saúde - Governo de Gameleira de Goiás</title>
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     :root {
-      --primary-color: #0d6efd;
-      --success-color: #198754;
-      --warning-color: #ffc107;
-      --danger-color: #dc3545;
+      --bg-canvas: #0d0e12;
+      --app-bg: #f8faf9;
+      --card-bg: #ffffff;
+      --card-dark: #0f1015;
+      --accent-lime: #cbfb45;
+      --accent-lime-hover: #b8ea32;
+      --text-main: #111317;
+      --text-muted: #797f8c;
+      --pill-gray: #eeeff3;
+      --border-soft: #e4e7ec;
     }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
     body {
-      background-color: #f4f6f9;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      padding-bottom: 95px;
+      background-color: var(--bg-canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 16px 8px 80px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      color: var(--text-main);
+    }
+
+    .app-phone-frame {
+      width: 100%;
+      max-width: 440px;
+      background-color: var(--app-bg);
+      border-radius: 40px;
+      padding: 24px 18px 95px;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 0 8px #181920;
+      min-height: 860px;
+    }
+
+    .status-bar-mock {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      padding: 0 4px;
+      color: var(--text-main);
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    .top-greeting h1 {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
       margin: 0;
     }
-    .header-box {
-      background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-      color: white;
-      padding: 16px;
-      border-radius: 0 0 16px 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    .top-greeting small {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
     }
-    .header-box-adm {
-      background: linear-gradient(135deg, #212529, #343a40) !important;
+
+    .avatar-lime-wrap {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      background-color: var(--accent-lime);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(203, 251, 69, 0.4);
     }
-    .card-custom {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+    .card-map-dark {
+      background: radial-gradient(circle at 75% 20%, #20242e 0%, #0d0f14 100%);
+      color: #fff;
+      border-radius: 28px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
       margin-bottom: 14px;
-      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
     }
-    .card-paciente-item {
-      background: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-left: 4px solid #0d6efd;
-      border-radius: 10px;
-      padding: 12px;
+    .pin-destination-box {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      text-align: right;
+    }
+    .pin-icon-lime {
+      color: var(--accent-lime);
+      font-size: 22px;
+    }
+    .route-simulated-line {
+      margin: 20px 0 16px;
+      border-bottom: 2px dashed var(--accent-lime);
+      position: relative;
+    }
+    .route-dot-start {
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .metric-card-white {
+      background-color: var(--card-bg);
+      border-radius: 22px;
+      padding: 16px;
+      border: 1px solid var(--border-soft);
+    }
+    .metric-card-dark {
+      background-color: var(--card-dark);
+      color: #fff;
+      border-radius: 22px;
+      padding: 16px;
+    }
+    .metric-card-dark h3 { color: var(--accent-lime); margin: 0; font-size: 22px; font-weight: 800; }
+
+    .modern-card {
+      background: var(--card-bg);
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .modern-card-dark {
+      background: var(--card-dark);
+      color: #fff;
+      border-radius: 22px;
+      padding: 16px;
       margin-bottom: 12px;
     }
-    .btn-action {
+
+    .form-control, .form-select {
+      border-radius: 14px !important;
+      background-color: #f1f3f7 !important;
+      border: 1px solid transparent !important;
+      padding: 10px 12px !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+    }
+    .form-control:focus, .form-select:focus {
+      background-color: #fff !important;
+      border-color: var(--accent-lime) !important;
+      box-shadow: 0 0 0 3px rgba(203, 251, 69, 0.35) !important;
+    }
+
+    .btn-brand-dark {
+      background-color: var(--card-dark);
+      color: #fff;
+      border-radius: 18px;
       padding: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: 10px;
-    }
-    .nav-bottom {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #ffffff;
-      border-top: 1px solid #dee2e6;
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 0;
-      z-index: 1050;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-    .nav-bottom button {
-      background: none;
+      font-weight: 700;
+      font-size: 13.5px;
       border: none;
-      color: #6c757d;
-      font-size: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-    }
-    .nav-bottom button.active {
-      color: #0d6efd;
-      font-weight: bold;
-    }
-    .nav-bottom button i {
-      font-size: 18px;
-      margin-bottom: 2px;
-    }
-    .canvas-preview {
       width: 100%;
-      border-radius: 8px;
-      margin-top: 8px;
-      display: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
-    .login-container {
-      max-width: 420px;
-      margin: 40px auto;
-      padding: 20px;
+    .btn-brand-lime {
+      background-color: var(--accent-lime);
+      color: var(--text-main);
+      border-radius: 18px;
+      padding: 12px;
+      font-weight: 800;
+      font-size: 14px;
+      border: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
+
+    .card-embarque-motorista {
+      background: #ffffff;
+      border: 1px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .card-paciente-item {
+      background: #f8faf9;
+      border: 1px solid var(--border-soft);
+      border-left: 4px solid var(--accent-lime);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .motorista-group-box {
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--border-soft);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .motorista-group-header {
+      background: #f1f3f7;
+      padding: 10px 14px;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .floating-pill-nav {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 390px;
+      background-color: #ffffff;
+      border-radius: 36px;
+      padding: 5px;
+      display: flex;
+      justify-content: space-between;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(0,0,0,0.06);
+      z-index: 1000;
+    }
+    .pill-nav-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--pill-gray);
+      color: #3e434f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pill-nav-btn.active {
+      background-color: var(--accent-lime);
+      color: var(--text-main);
+      transform: scale(1.06);
+      box-shadow: 0 3px 10px rgba(203, 251, 69, 0.4);
+    }
+    .canvas-preview { width: 100%; border-radius: 14px; margin-top: 8px; display: none; }
   </style>
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
-<div id="loginScreen" class="login-container">
-  <div class="card card-custom p-4 text-center shadow">
-    <div class="mb-3">
-      <i class="bi bi-hospital text-primary" style="font-size: 48px;"></i>
-      <h5 class="fw-bold mt-2">Transporte da Saúde</h5>
-      <p class="text-muted small">Controle de Escala, Frota & Manutenção</p>
+<div class="app-phone-frame">
+
+  <!-- BARRA DE STATUS -->
+  <div class="status-bar-mock">
+    <span id="relogioTopo">09:41</span>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-dark rounded-pill" style="font-size: 10px;" id="badgeAmbiente">Painel Completo</span>
+      <i class="bi bi-wifi"></i>
+      <i class="bi bi-battery-full"></i>
     </div>
-    
-    <div class="mb-3 text-start">
-      <label class="form-label small text-muted">Acessar como:</label>
-      <select id="loginMotoristaSelect" class="form-select" onchange="verificarOpcaoPerfil(this)">
-        <optgroup label="Central / Gestão">
-          <option value="ADM">👑 Gestão / Central de Regulação (ADM)</option>
+  </div>
+
+  <!-- ========================================================== -->
+  <!-- 1. TELA DE LOGIN                                           -->
+  <!-- ========================================================== -->
+  <div id="telaLogin">
+    <div class="top-header">
+      <div class="top-greeting">
+        <h1>Saúde<br>Gameleira</h1>
+        <small>Transporte Sanitário Integrado</small>
+      </div>
+      <div class="avatar-lime-wrap">
+        <i class="bi bi-hospital fs-4 text-dark"></i>
+      </div>
+    </div>
+
+    <div class="card-map-dark mb-3 text-center py-4">
+      <h6 class="fw-bold mb-1">Prefeitura de Gameleira de Goiás</h6>
+      <small class="text-white-50">Diário de Bordo & Regulação de Frotas</small>
+    </div>
+
+    <div class="modern-card">
+      <label class="form-label small text-muted fw-bold">Selecione seu Perfil:</label>
+      <select id="selectPerfil" class="form-select mb-3">
+        <optgroup label="Central de Atendimento">
+          <option value="ADM" selected>👑 Gestão / Regulação (ADM)</option>
         </optgroup>
-        <optgroup label="Quadro de Motoristas">
-          <option value="Paulo" selected>Paulo Portilho</option>
-          <option value="Dinho">Dinho</option>
-          <option value="Luiz">Luiz</option>
-          <option value="Lucas">Lucas</option>
-          <option value="Gercimar">Gercimar</option>
-          <option value="Bruno">Bruno</option>
-          <option value="Motorista Ambulância 1">Motorista Ambulância 1</option>
-          <option value="Motorista Ambulância 2">Motorista Ambulância 2</option>
-          <option value="__NOVO__">➕ Cadastrar Motorista Eventual / Diarista</option>
+        <optgroup label="Condutores de Saúde">
+          <option value="Paulo Portilho">Paulo Portilho (Motorista)</option>
+          <option value="Dinho">Dinho (Motorista)</option>
+          <option value="Luiz">Luiz (Motorista)</option>
+          <option value="Lucas">Lucas (Motorista)</option>
         </optgroup>
       </select>
-    </div>
 
-    <div id="boxMotoristaEventual" class="p-2 mb-3 bg-light rounded text-start d-none">
-      <label class="form-label small text-muted">Nome Completo:</label>
-      <input type="text" id="eventualNome" class="form-control mb-2" placeholder="Nome do motorista">
-      <label class="form-label small text-muted">CPF:</label>
-      <input type="text" id="eventualCpf" class="form-control" placeholder="000.000.000-00">
-    </div>
+      <label class="form-label small text-muted fw-bold">Senha de Acesso:</label>
+      <input type="password" id="inputSenha" class="form-control mb-2" value="1234">
+      <small class="text-muted d-block mb-3" style="font-size: 11px;">
+        * Pré-configurado para teste rápido no CodePen.
+      </small>
 
-    <div class="mb-3 text-start">
-      <label class="form-label small text-muted">Senha de Acesso (Motorista: 1234 | ADM: admin):</label>
-      <input type="password" id="loginSenha" class="form-control form-control-lg" placeholder="••••">
+      <button class="btn-brand-lime" onclick="autenticarUsuario()">
+        Acessar Painel <i class="bi bi-arrow-right"></i>
+      </button>
     </div>
-
-    <button class="btn btn-primary w-100 btn-action" type="button" onclick="realizarLogin()">
-      <i class="bi bi-box-arrow-in-right"></i> Entrar no Sistema
-    </button>
   </div>
-</div>
 
-<!-- ========================================== -->
-<!-- 1. MÓDULO GESTÃO (ADM)                     -->
-<!-- ========================================== -->
-<div id="admApp" class="d-none">
-  <div class="header-box header-box-adm">
-    <div class="d-flex justify-content-between align-items-center">
-      <div>
-        <h6 class="m-0 fw-bold"><i class="bi bi-shield-lock-fill"></i> Central de Gestão (ADM)</h6>
-        <small class="text-white-50">Escala, Manutenção & Emissão de Relatórios</small>
+  <!-- ========================================================== -->
+  <!-- 2. MÓDULO MOTORISTA                                        -->
+  <!-- ========================================================== -->
+  <div id="moduloMotorista" class="d-none">
+    <div class="top-header">
+      <div class="top-greeting">
+        <h1 id="saudacaoMotorista">Bom dia,<br>Paulo</h1>
+        <small>Transporte Sanitário • Condutor</small>
       </div>
-      <button class="btn btn-sm btn-outline-light" onclick="realizarLogout()"><i class="bi bi-power"></i> Sair</button>
+      <div class="avatar-lime-wrap" onclick="efetuarLogout()" title="Sair">
+        <i class="bi bi-box-arrow-right fs-4 text-dark"></i>
+      </div>
     </div>
-  </div>
 
-  <div class="container mt-3">
-
-    <!-- ABA ADM 1: LANÇAR ESCALA -->
-    <div id="adm-sec-cadastrar" class="adm-section">
-      <div class="card card-custom p-3 border-start border-4 border-primary">
-        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-calendar-plus"></i> Lançar Escala de Viagem</h6>
-        
-        <div class="row g-2 mb-2">
-          <div class="col-6">
-            <label class="form-label small text-muted fw-bold">Data da Viagem:</label>
-            <input type="date" id="admCadData" class="form-control">
-          </div>
-          <div class="col-6">
-            <label class="form-label small text-muted fw-bold">Motorista Escalado:</label>
-            <select id="admCadMotorista" class="form-select">
-              <option value="Paulo">Paulo Portilho</option>
-              <option value="Dinho">Dinho</option>
-              <option value="Luiz">Luiz</option>
-              <option value="Lucas">Lucas</option>
-              <option value="Gercimar">Gercimar</option>
-              <option value="Bruno">Bruno</option>
-              <option value="Motorista Ambulância 1">Motorista Ambulância 1</option>
-              <option value="Motorista Ambulância 2">Motorista Ambulância 2</option>
-            </select>
+    <!-- SUB-ABA MOTORISTA: DASHBOARD -->
+    <div id="aba-dash-mot" class="sub-secao-motorista">
+      <div class="card-map-dark">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="badge bg-secondary text-white rounded-pill px-3 py-1" style="font-size: 11px;">
+            <i class="bi bi-geo-alt-fill text-warning me-1"></i> ROTA REGULADA
+          </span>
+          <div class="pin-destination-box">
+            <span class="d-block" id="dashDestino">Goiânia - GO</span>
+            <i class="bi bi-geo-alt-fill pin-icon-lime"></i>
           </div>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label small text-muted fw-bold">Veículo Designado:</label>
-          <select id="admCadVeiculo" class="form-select">
+        <div class="route-simulated-line">
+          <div class="route-dot-start"></div>
+          <small class="text-white-50" style="font-size: 11px;">Origem: Gameleira de Goiás</small>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <div>
+            <small class="text-white-50 d-block" style="font-size: 11px;">Veículo Ativo</small>
+            <b class="text-white" id="dashVeiculoNome">Van (Placa: ABC-1234)</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card-white">
+          <h3 id="badgeTotalPassageiros" class="m-0 fw-bold">0</h3>
+          <span class="small text-muted">Passageiros Hoje</span>
+        </div>
+        <div class="metric-card-dark">
+          <h3 id="badgeKmTurno">★ 0 Km</h3>
+          <span class="small text-white-50" id="badgeMediaConsumo">Média: -- Km/L</span>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-bold m-0"><i class="bi bi-person-check-fill text-primary"></i> Controle de Embarque</h6>
+        <button class="btn btn-sm btn-outline-dark rounded-pill py-0 px-2" onclick="renderizarViagensMotorista()">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+
+      <div id="containerListaEmbarque"></div>
+    </div>
+
+    <!-- SUB-ABA MOTORISTA: PONTO & FROTA -->
+    <div id="aba-turno-mot" class="sub-secao-motorista d-none">
+      <div class="modern-card mb-3">
+        <h6 class="fw-bold mb-3"><i class="bi bi-play-circle text-success"></i> 1. Início do Turno</h6>
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Veículo:</label>
+          <select id="motVeiculoSelect" class="form-select" onchange="atualizarVeiculoAtivoMotorista()">
             <option value="Van (Placa: ABC-1234)">Van (Placa: ABC-1234)</option>
             <option value="Citroën C3 (Placa: BRA-2021)">Citroën C3 (Placa: BRA-2021)</option>
             <option value="Fiat Cronos (Placa: SAU-4567)">Fiat Cronos (Placa: SAU-4567)</option>
-            <option value="Chevrolet Spin (Placa: HOS-8901)">Chevrolet Spin (Placa: HOS-8901)</option>
-            <option value="VW Gol 1 (Placa: MED-1122)">VW Gol 1 (Placa: MED-1122)</option>
-            <option value="VW Gol 2 (Placa: ENF-3344)">VW Gol 2 (Placa: ENF-3344)</option>
-            <option value="Renault Sandero (Placa: AMB-5566)">Renault Sandero (Placa: AMB-5566)</option>
-            <option value="Renault Oroch (Placa: REG-7788)">Renault Oroch (Placa: REG-7788)</option>
             <option value="Ambulância 1 (UTI - AMB-0101)">Ambulância 1 (UTI - AMB-0101)</option>
-            <option value="Ambulância 2 (Básica - AMB-0202)">Ambulância 2 (Básica - AMB-0202)</option>
           </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Km Inicial no Painel:</label>
+          <input type="number" id="inputKmInicial" class="form-control" placeholder="Ex: 45200" oninput="recalcularMetricasMotorista()">
+        </div>
+        <button class="btn-brand-dark" onclick="registrarPontoEntradaMotorista()">
+          <i class="bi bi-clock"></i> Registrar Ponto de Entrada
+        </button>
+        <small class="text-success fw-bold d-block mt-1 text-center" id="horaEntradaFeedback"></small>
+      </div>
+
+      <div class="modern-card mb-3 border-start border-4 border-warning">
+        <h6 class="fw-bold mb-2"><i class="bi bi-fuel-pump"></i> 2. Abastecimento</h6>
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Valor (R$):</label>
+            <input type="number" id="inputValorAbastece" class="form-control" placeholder="0,00" oninput="recalcularMetricasMotorista()">
+          </div>
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Litros:</label>
+            <input type="number" id="inputLitrosAbastece" class="form-control" placeholder="0.00 L" oninput="recalcularMetricasMotorista()">
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary w-100 rounded-pill" onclick="simularCupomMotorista()">
+          <i class="bi bi-magic"></i> Simular OCR Cupom Fiscal
+        </button>
+      </div>
+
+      <div class="modern-card">
+        <h6 class="fw-bold text-danger mb-2">3. Encerramento</h6>
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Km Final no Retorno:</label>
+          <input type="number" id="inputKmFinal" class="form-control" placeholder="Ex: 45310" oninput="recalcularMetricasMotorista()">
+        </div>
+        <div class="p-2 bg-light rounded text-center small fw-bold mb-2" id="resumoCalculoTurno">
+          Distância: 0 Km | Média: -- Km/L
+        </div>
+        <button class="btn btn-danger rounded-pill w-100 py-2 fw-bold" onclick="encerrarTurnoMotorista()">
+          Finalizar Turno & Salvar Diário
+        </button>
+      </div>
+    </div>
+
+    <!-- SUB-ABA MOTORISTA: FOTOS & COMPROVANTES -->
+    <div id="aba-fotos-mot" class="sub-secao-motorista d-none">
+      <div class="modern-card">
+        <h6 class="fw-bold mb-2"><i class="bi bi-camera"></i> Registro de Presença & Comprovantes</h6>
+        <input type="file" id="inputFotoCamera" accept="image/*" class="form-control mb-2" onchange="processarFotoComCarimbo(event)">
+        <canvas id="canvasCarimbo" class="canvas-preview"></canvas>
+        <textarea id="inputObsFoto" class="form-control mt-2" placeholder="Observações do embarque..."></textarea>
+        <button class="btn-brand-lime mt-2" onclick="salvarFotoComprovante()">
+          <i class="bi bi-save"></i> Gravar Comprovante
+        </button>
+      </div>
+    </div>
+
+    <!-- SUB-ABA MOTORISTA: BOLETIM / PDF -->
+    <div id="aba-relatorio-mot" class="sub-secao-motorista d-none">
+      <div class="modern-card">
+        <div class="text-center border-bottom pb-2 mb-2">
+          <h6 class="fw-bold m-0">PREFEITURA DE GAMELEIRA DE GOIÁS</h6>
+          <small class="text-muted">Secretaria de Saúde • Diário do Condutor</small>
+        </div>
+
+        <table class="table table-sm small mb-3">
+          <tbody>
+            <tr><th>Condutor:</th><td id="repNomeMotorista">Paulo Portilho</td></tr>
+            <tr><th>Veículo:</th><td id="repVeiculoNome">Van (ABC-1234)</td></tr>
+            <tr><th>Jornada:</th><td id="repJornadaHoras">--</td></tr>
+            <tr><th>Quilometragem:</th><td id="repKmTotal">0 Km</td></tr>
+            <tr><th>Autonomia:</th><td id="repMediaAutonomia">-- Km/L</td></tr>
+          </tbody>
+        </table>
+
+        <div class="d-flex flex-column gap-2">
+          <button class="btn-brand-dark" onclick="gerarPdfBoletimMotorista()">
+            <i class="bi bi-file-earmark-pdf-fill text-danger"></i> Baixar Boletim em PDF
+          </button>
+          <button class="btn btn-success rounded-pill fw-bold" onclick="baixarPlanilhaCSV()">
+            <i class="bi bi-file-earmark-spreadsheet-fill"></i> Baixar Planilha (.CSV)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BARRA INFERIOR MOTORISTA -->
+    <div class="floating-pill-nav" id="navMotorista">
+      <button class="pill-nav-btn active" onclick="trocarAbaMotorista('aba-dash-mot', this)"><i class="bi bi-house-door-fill"></i></button>
+      <button class="pill-nav-btn" onclick="trocarAbaMotorista('aba-turno-mot', this)"><i class="bi bi-car-front-fill"></i></button>
+      <button class="pill-nav-btn" onclick="trocarAbaMotorista('aba-fotos-mot', this)"><i class="bi bi-camera-fill"></i></button>
+      <button class="pill-nav-btn" onclick="trocarAbaMotorista('aba-relatorio-mot', this)"><i class="bi bi-clock-history"></i></button>
+    </div>
+  </div>
+
+  <!-- ========================================================== -->
+  <!-- 3. MÓDULO GESTÃO & REGULAÇÃO (ADM) COM AS 4 SEÇÕES        -->
+  <!-- ========================================================== -->
+  <div id="moduloAdm" class="d-none">
+    <div class="top-header">
+      <div class="top-greeting">
+        <h1>Gestão &<br>Regulação</h1>
+        <small>Secretaria de Saúde • Gameleira</small>
+      </div>
+      <div class="avatar-lime-wrap" onclick="efetuarLogout()" title="Sair">
+        <i class="bi bi-shield-lock-fill fs-4 text-dark"></i>
+      </div>
+    </div>
+
+    <!-- SEÇÃO ADM 1: LANÇAR ESCALA -->
+    <div id="adm-sec-cadastrar" class="sub-secao-adm">
+      <div class="modern-card">
+        <h6 class="fw-bold mb-3"><i class="bi bi-calendar-plus text-primary"></i> Lançar Escala de Viagem</h6>
+
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Condutor Escalado:</label>
+          <select id="admCadMotorista" class="form-select">
+            <option value="Paulo Portilho">Paulo Portilho</option>
+            <option value="Dinho">Dinho</option>
+            <option value="Luiz">Luiz</option>
+            <option value="Lucas">Lucas</option>
+          </select>
+        </div>
+
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Data:</label>
+            <input type="date" id="admCadData" class="form-control">
+          </div>
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Veículo & Placa:</label>
+            <select id="admCadVeiculo" class="form-select">
+              <option value="Van (Placa: ABC-1234)">Van (Placa: ABC-1234)</option>
+              <option value="Citroën C3 (Placa: BRA-2021)">Citroën C3 (Placa: BRA-2021)</option>
+              <option value="Fiat Cronos (Placa: SAU-4567)">Fiat Cronos (Placa: SAU-4567)</option>
+              <option value="Ambulância 1 (UTI - AMB-0101)">Ambulância 1 (UTI - AMB-0101)</option>
+            </select>
+          </div>
         </div>
 
         <hr>
 
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="fw-bold m-0"><i class="bi bi-people-fill text-primary"></i> Pacientes da Rota</h6>
-          <button class="btn btn-sm btn-outline-success fw-bold" type="button" onclick="adicionarCampoNovoPaciente()">
-            <i class="bi bi-plus-circle"></i> Adicionar Paciente (+)
-          </button>
+          <b class="small text-dark"><i class="bi bi-people-fill text-primary"></i> Passageiros da Rota:</b>
+          <button class="btn btn-sm btn-outline-dark rounded-pill fw-bold" onclick="adicionarCampoNovoPacienteAdm()">+ Adicionar Paciente</button>
         </div>
 
-        <div id="listaPacientesDinamicosContainer"></div>
+        <div id="listaPacientesDinamicosAdm"></div>
 
-        <button class="btn btn-outline-success w-100 mb-3 py-2 fw-bold" type="button" onclick="adicionarCampoNovoPaciente()">
-          <i class="bi bi-plus-lg"></i> Adicionar Outro Paciente (+)
-        </button>
-
-        <button class="btn btn-primary w-100 btn-action" type="button" onclick="salvarTodaEscalaAdm()">
-          <i class="bi bi-check-all fs-5"></i> Gravar Todos na Rota do Motorista
+        <button class="btn-brand-lime mt-3" onclick="salvarTodaEscalaAdm()">
+          <i class="bi bi-check-circle-fill"></i> Gravar Escala Oficial
         </button>
       </div>
     </div>
 
-    <!-- ABA ADM 2: ESCALA GERAL -->
-    <div id="adm-sec-rotasgerais" class="adm-section d-none">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h6 class="fw-bold m-0"><i class="bi bi-list-check"></i> Escala Geral de Viagens</h6>
-        <span class="badge bg-primary" id="admTotalViagensBadge">0</span>
-      </div>
-      <div id="admListaRotasContainer"></div>
-    </div>
+    <!-- SEÇÃO ADM 2: ESCALA GERAL CONSOLIDADA -->
+    <div id="adm-sec-rotasgerais" class="sub-secao-adm d-none">
+      <div class="modern-card mb-3">
+        <h6 class="fw-bold mb-2"><i class="bi bi-funnel-fill text-primary"></i> Filtrar Escala Geral</h6>
 
-    <!-- ABA ADM 3: RELATÓRIO DE MANUTENÇÃO E CONSERVAÇÃO -->
-    <div id="adm-sec-manutencao" class="adm-section d-none">
-      <div class="card card-custom p-3 border-start border-4 border-warning mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="fw-bold text-dark m-0"><i class="bi bi-tools text-warning"></i> Manutenção e Conservação da Frota</h6>
-          <span class="badge bg-dark" id="admTotalManutencoesBadge">0 serviços</span>
-        </div>
-        <p class="text-muted small">Relatório dos serviços preenchidos pelos motoristas com valores, notas e controle de quilometragem.</p>
-
-        <div class="row g-2 mb-3">
-          <div class="col-6">
-            <div class="p-2 bg-light rounded text-center">
-              <span class="text-muted small d-block">Gasto Total com Manutenção:</span>
-              <h5 class="fw-bold text-danger m-0" id="admTotalGastoManutencao">R$ 0,00</h5>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="p-2 bg-light rounded text-center">
-              <span class="text-muted small d-block">Total Abastecido:</span>
-              <h5 class="fw-bold text-primary m-0" id="admTotalGastoCombustivel">R$ 0,00</h5>
-            </div>
-          </div>
-        </div>
-
-        <h6 class="fw-bold small text-muted">Histórico de Serviços & Despesas:</h6>
-        <div id="admHistoricoManutencoesContainer" class="small"></div>
-      </div>
-
-      <div class="card card-custom p-3 border-start border-4 border-danger">
-        <h6 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-octagon"></i> Ocorrências e Avarias Reportadas</h6>
-        <div id="admListaAlertasContainer" class="small"></div>
-      </div>
-    </div>
-
-    <!-- ABA ADM 4: CENTRAL GERAL DE RELATÓRIOS -->
-    <div id="adm-sec-relatorios" class="adm-section d-none">
-      <div class="card card-custom p-3 border-start border-4 border-success">
-        <h6 class="fw-bold text-success mb-3"><i class="bi bi-file-earmark-bar-graph"></i> Central de Emissão de Relatórios (ADM)</h6>
-        
-        <div class="row g-2 mb-2">
-          <div class="col-6">
-            <label class="form-label small text-muted fw-bold">Tipo de Relatório:</label>
-            <select id="admRelTipo" class="form-select">
-              <option value="Geral">Relatório Completo Consolidado</option>
-              <option value="Combustivel">Gastos de Combustível (Litros & R$)</option>
-              <option value="Manutencao">Manutenção e Conservação de Frota</option>
-              <option value="Pacientes">Controle de Presença / Faltas de Pacientes</option>
-              <option value="Avarias">Vistoria Inicial & Avarias</option>
-            </select>
-          </div>
-          <div class="col-6">
-            <label class="form-label small text-muted fw-bold">Filtrar Motorista:</label>
-            <select id="admRelMotorista" class="form-select">
-              <option value="TODOS">Todos os Motoristas</option>
-              <option value="Paulo">Paulo Portilho</option>
-              <option value="Dinho">Dinho</option>
-              <option value="Luiz">Luiz</option>
-              <option value="Lucas">Lucas</option>
-              <option value="Gercimar">Gercimar</option>
-              <option value="Bruno">Bruno</option>
-              <option value="Motorista Ambulância 1">Motorista Ambulância 1</option>
-              <option value="Motorista Ambulância 2">Motorista Ambulância 2</option>
-            </select>
-          </div>
-        </div>
-
-        <button class="btn btn-success w-100 btn-action mb-3" type="button" onclick="gerarRelatorioAdm()">
-          <i class="bi bi-funnel"></i> Gerar e Visualizar Relatório
-        </button>
-
-        <!-- ÁREA DO RELATÓRIO GERADO -->
-        <div id="areaRelatorioAdmResultado" class="p-3 bg-light rounded border d-none">
-          <div class="text-center border-bottom pb-2 mb-3">
-            <h6 class="fw-bold m-0" id="relAdmTitulo">RELATÓRIO OFICIAL DA GESTÃO</h6>
-            <small class="text-muted" id="relAdmSubtitulo">Secretaria Municipal de Saúde</small>
-          </div>
-          <div id="relAdmConteudo" class="small mb-3"></div>
-          <button class="btn btn-primary w-100 btn-sm fw-bold" onclick="window.print()">
-            <i class="bi bi-printer"></i> Imprimir / Exportar em PDF
-          </button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- NAVEGAÇÃO ADM -->
-  <div class="nav-bottom">
-    <button class="active" type="button" onclick="showAdmTab('cadastrar', this)">
-      <i class="bi bi-calendar-plus"></i>
-      Lançar Escala
-    </button>
-    <button type="button" onclick="showAdmTab('rotasgerais', this)">
-      <i class="bi bi-list-task"></i>
-      Escala Geral
-    </button>
-    <button type="button" onclick="showAdmTab('manutencao', this)">
-      <i class="bi bi-tools"></i>
-      Manutenção
-    </button>
-    <button type="button" onclick="showAdmTab('relatorios', this)">
-      <i class="bi bi-file-earmark-text"></i>
-      Relatórios
-    </button>
-  </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 2. MÓDULO MOTORISTA                        -->
-<!-- ========================================== -->
-<div id="motoristaApp" class="d-none">
-  <div class="header-box">
-    <div class="d-flex justify-content-between align-items-center">
-      <div>
-        <h6 class="m-0 fw-bold"><i class="bi bi-hospital"></i> Transporte Saúde</h6>
-        <small id="userDisplay">Motorista: Paulo Portilho</small>
-      </div>
-      <div>
-        <span class="badge bg-light text-primary me-1" id="statusBadge">Turno Fechado</span>
-        <button class="btn btn-sm btn-light py-0 px-2 text-danger" title="Sair" onclick="realizarLogout()"><i class="bi bi-power"></i></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="container mt-3">
-
-    <!-- DASHBOARD -->
-    <div id="sec-dashboard" class="app-section">
-      <div class="card card-custom border-start border-4 border-primary p-3">
-        <div class="d-flex align-items-center mb-1">
-          <i class="bi bi-shield-check text-primary fs-5 me-2"></i>
-          <h6 class="m-0 fw-bold">Oração & Proteção do Dia</h6>
-        </div>
-        <p class="text-muted small m-0 fst-italic">
-          "Que o Senhor ilumine nossos caminhos, dê destreza em nossas mãos, proteja nossos passageiros e garanta uma jornada de paz e excelência."
-        </p>
-      </div>
-
-      <div class="card card-custom p-3 border-start border-4 border-warning">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="fw-bold m-0"><i class="bi bi-truck text-warning"></i> Veículo Designado</h6>
-          <span class="badge bg-dark" id="dashVeiculoBadge">Van (ABC-1234)</span>
-        </div>
-        <div class="row g-2 small mt-1">
-          <div class="col-6">
-            <div class="p-2 bg-light rounded">
-              <span class="text-muted d-block">Troca de Óleo:</span>
-              <b id="dashOleoKm">Em 48.000 Km</b>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="p-2 bg-light rounded">
-              <span class="text-muted d-block">Próxima Revisão:</span>
-              <b id="dashRevisaoKm">Em 50.000 Km</b>
-            </div>
-          </div>
-        </div>
-        
-        <div class="p-2 bg-light rounded mt-2 border small">
-          <span class="text-muted d-block">Último serviço realizado:</span>
-          <b id="dashUltimaManutencaoTxt">Troca de Óleo aos 40.000 Km (R$ 380,00)</b>
-        </div>
-
-        <button class="btn btn-sm btn-outline-danger w-100 mt-2" type="button" onclick="enviarAlertaEmailManutencao()">
-          <i class="bi bi-envelope-exclamation"></i> Enviar Alerta Preventivo por E-mail
-        </button>
-      </div>
-
-      <div class="card card-custom p-3">
-        <h6 class="fw-bold"><i class="bi bi-alarm"></i> Despertador & Alertas de Parada</h6>
-        <div class="input-group mt-2">
-          <input type="time" id="alarmTime" class="form-control">
-          <button class="btn btn-outline-primary" type="button" onclick="setQuickAlarm()"><i class="bi bi-bell"></i> Ativar</button>
-        </div>
-        <small class="text-muted mt-1 d-block" id="alarmFeedback"></small>
-      </div>
-
-      <div class="row g-2 mb-3">
-        <div class="col-6">
-          <div class="card card-custom p-3 text-center">
-            <h4 class="fw-bold text-primary m-0" id="totalViagensCount">0</h4>
-            <small class="text-muted">Pacientes Hoje</small>
-          </div>
-        </div>
-        <div class="col-6">
-          <div class="card card-custom p-3 text-center">
-            <h4 class="fw-bold text-success m-0" id="kmTotalDisplay">0 Km</h4>
-            <small class="text-muted">Percorrido Hoje</small>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PONTO & FROTA (ABASTECIMENTO COM VALOR R$ + OCR IA) -->
-    <div id="sec-turno" class="app-section d-none">
-      <div class="card card-custom p-3">
-        <h6 class="fw-bold mb-3"><i class="bi bi-key"></i> Abertura / Fechamento de Turno</h6>
-        
-        <!-- 1. INÍCIO DA JORNADA -->
-        <div class="mb-3 p-3 bg-light rounded-3">
-          <h6 class="fw-bold text-primary"><i class="bi bi-play-circle"></i> 1. Início da Jornada</h6>
-          
-          <div class="mb-2">
-            <label class="form-label small text-muted fw-bold">Veículo em Uso:</label>
-            <select id="selectVeiculo" class="form-select form-select-lg" onchange="atualizarVeiculoAtivo()">
-              <option value="Van (Placa: ABC-1234)">Van (Placa: ABC-1234)</option>
-              <option value="Citroën C3 (Placa: BRA-2021)">Citroën C3 (Placa: BRA-2021)</option>
-              <option value="Fiat Cronos (Placa: SAU-4567)">Fiat Cronos (Placa: SAU-4567)</option>
-              <option value="Chevrolet Spin (Placa: HOS-8901)">Chevrolet Spin (Placa: HOS-8901)</option>
-              <option value="VW Gol 1 (Placa: MED-1122)">VW Gol 1 (Placa: MED-1122)</option>
-              <option value="VW Gol 2 (Placa: ENF-3344)">VW Gol 2 (Placa: ENF-3344)</option>
-              <option value="Renault Sandero (Placa: AMB-5566)">Renault Sandero (Placa: AMB-5566)</option>
-              <option value="Renault Oroch (Placa: REG-7788)">Renault Oroch (Placa: REG-7788)</option>
-              <option value="Ambulância 1 (UTI - AMB-0101)">Ambulância 1 (UTI - AMB-0101)</option>
-              <option value="Ambulância 2 (Básica - AMB-0202)">Ambulância 2 (Básica - AMB-0202)</option>
-            </select>
-          </div>
-
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" id="checkChaveEntrada">
-            <label class="form-check-label fw-semibold" for="checkChaveEntrada">Pegou a chave na gaveta?</label>
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label small text-muted fw-bold">Km Inicial do Painel:</label>
-            <input type="number" id="kmInicialInput" class="form-control" placeholder="Ex: 45200">
-          </div>
-
-          <!-- VISTORIA DE AVARIAS -->
-          <div class="p-2 bg-white rounded border mb-3">
-            <div class="form-check form-switch mb-1">
-              <input class="form-check-input" type="checkbox" id="checkTemAvariaInicio" onchange="toggleAvariaInicio(this)">
-              <label class="form-check-label fw-bold text-danger" for="checkTemAvariaInicio">
-                <i class="bi bi-shield-slash"></i> O veículo possui alguma avaria prévia?
-              </label>
-            </div>
-            
-            <div id="boxDetalhesAvariaInicio" class="d-none mt-2">
-              <div class="mb-2">
-                <label class="form-label small text-muted">Tipo / Local do Dano:</label>
-                <select id="avariaInicioTipo" class="form-select form-select-sm">
-                  <option value="Arranhão / Amassado na Lataria">Arranhão / Amassado na Lataria</option>
-                  <option value="Parachoque Trincado / Desencaixado">Parachoque Trincado / Desencaixado</option>
-                  <option value="Farol / Lanterna Quebrada">Farol / Lanterna Quebrada</option>
-                  <option value="Pneu Danificado / Roda Ralada">Pneu Danificado / Roda Ralada</option>
-                  <option value="Vidro / Retrovisor Trincado">Vidro / Retrovisor Trincado</option>
-                  <option value="Estofamento / Interior Danificado">Estofamento / Interior Danificado</option>
-                </select>
-              </div>
-              <div class="mb-2">
-                <label class="form-label small text-muted">Descreva a avaria encontrada:</label>
-                <textarea id="avariaInicioDescricao" class="form-control form-control-sm" rows="2" placeholder="Ex: Risco na porta lateral direita..."></textarea>
-              </div>
-              <div class="mb-1">
-                <label class="form-label small text-muted">Foto da Avaria:</label>
-                <input type="file" id="avariaInicioFoto" accept="image/*" capture="environment" class="form-control form-control-sm">
-              </div>
-            </div>
-          </div>
-
-          <button class="btn btn-primary w-100 btn-action" type="button" onclick="registrarEntrada()" id="btnRegistrarEntrada">
-            <i class="bi bi-play-circle"></i> Registrar Ponto de Entrada
-          </button>
-          <small class="text-success mt-1 d-block" id="entradaTimestamp"></small>
-        </div>
-
-        <!-- 2. ABASTECIMENTO (VALOR R$ + LITROS + LEITURA IA) -->
-        <div class="mb-3 p-3 bg-light rounded-3 border border-warning">
-          <h6 class="fw-bold text-warning-emphasis"><i class="bi bi-fuel-pump"></i> 2. Abastecimento na Chegada (Tanque Cheio)</h6>
-          
-          <div class="row g-2 mb-2">
-            <div class="col-6">
-              <label class="form-label small text-muted fw-bold">Valor Total Pago (R$):</label>
-              <input type="number" step="0.01" id="abasteceReais" class="form-control" placeholder="R$ 0,00">
-            </div>
-            <div class="col-6">
-              <label class="form-label small text-muted fw-bold">Quantidade (Litros):</label>
-              <input type="number" step="0.01" id="abasteceLitros" class="form-control" placeholder="0.00 L">
-            </div>
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label small text-muted fw-bold">Combustível:</label>
-            <select id="abasteceTipo" class="form-select">
-              <option value="Diesel S10">Diesel S10</option>
-              <option value="Gasolina Comum">Gasolina Comum</option>
-              <option value="Etanol">Etanol</option>
-            </select>
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label small text-muted fw-bold"><i class="bi bi-camera"></i> Foto do Cupom Fiscal (Leitura Automática por IA):</label>
-            <input type="file" id="abasteceFoto" accept="image/*" capture="environment" class="form-control" onchange="processarLeituraComprovanteIA(event)">
-            <small class="text-success d-none mt-1" id="feedbackOcrIa"><i class="bi bi-check2-circle"></i> Leitura por IA concluída: Valores confirmados!</small>
-          </div>
-        </div>
-
-        <!-- 3. FIM DA JORNADA -->
-        <div class="p-3 bg-light rounded-3">
-          <h6 class="fw-bold text-danger">3. Fim da Jornada</h6>
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" id="checkChaveSaida">
-            <label class="form-check-label fw-semibold" for="checkChaveSaida">Devolveu a chave na gaveta?</label>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small text-muted">Km Final do Painel:</label>
-            <input type="number" id="kmFinalInput" class="form-control" placeholder="Ex: 45310" oninput="calcularKmTotal()">
-          </div>
-          <div class="alert alert-info py-2 small mb-2" id="boxCalculoKm">Total rodado: 0 Km</div>
-          <button class="btn btn-danger w-100 btn-action" type="button" onclick="registrarSaida()" id="btnRegistrarSaida" disabled>
-            <i class="bi bi-stop-circle"></i> Encerrar Turno & Fechar Ponto
-          </button>
-          <small class="text-danger mt-1 d-block" id="saidaTimestamp"></small>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROTAS DO MOTORISTA -->
-    <div id="sec-rotas" class="app-section d-none">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h6 class="fw-bold m-0"><i class="bi bi-geo-alt"></i> Minha Escala de Viagens</h6>
-        <button class="btn btn-sm btn-outline-primary" type="button" onclick="carregarRotasDoMotorista()"><i class="bi bi-arrow-clockwise"></i> Atualizar</button>
-      </div>
-
-      <div class="card card-custom p-3 mb-3 bg-success text-white">
-        <h6 class="fw-bold m-0"><i class="bi bi-play-circle-fill"></i> Iniciar Viagem Geral & Notificar Pacientes</h6>
-        <small class="d-block mt-1">Coloca toda a rota em trânsito e abre o envio de mensagem para todos os passageiros da lista.</small>
-        <button class="btn btn-light btn-sm fw-bold text-success mt-2 w-100" type="button" onclick="iniciarViagemGeralENotificarTodos()">
-          <i class="bi bi-whatsapp"></i> Iniciar Deslocamento e Avisar Todos
-        </button>
-      </div>
-
-      <div class="card card-custom p-3 mb-3 bg-primary text-white">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h6 class="fw-bold m-0"><i class="bi bi-signpost-split"></i> Rota Inteligente no Maps</h6>
-            <small>Multi-paradas por ordem de horário</small>
-          </div>
-          <button class="btn btn-light btn-sm fw-bold text-primary" type="button" onclick="abrirRotaCompletaMaps()">
-            <i class="bi bi-map-fill"></i> Abrir no Maps
-          </button>
-        </div>
-      </div>
-
-      <div id="rotasContainer"></div>
-    </div>
-
-    <!-- FORMULÁRIO DE MANUTENÇÃO PREENCHIDO PELO MOTORISTA -->
-    <div id="sec-manutencao-motorista" class="app-section d-none">
-      <div class="card card-custom p-3 border-start border-4 border-warning">
-        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-tools text-warning"></i> Registrar Manutenção / Serviço Realizado</h6>
-        <p class="text-muted small">Preencha sempre que fizer troca de óleo, revisão, troca de peças ou serviços mecânicos no veículo.</p>
-
-        <div class="row g-2 mb-2">
-          <div class="col-6">
-            <label class="form-label small text-muted fw-bold">Data do Serviço:</label>
-            <input type="date" id="motMaintData" class="form-control">
-          </div>
-          <div class="col-6">
-            <label class="form-label small text-muted fw-bold">Km no Momento:</label>
-            <input type="number" id="motMaintKm" class="form-control" placeholder="Ex: 45300">
-          </div>
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Filtrar por Motorista:</label>
+          <select id="filtroEscalaMotorista" class="form-select" onchange="aplicarFiltrosEscalaGeralAdm()">
+            <option value="TODOS">Todos os Motoristas</option>
+            <option value="Paulo Portilho">Paulo Portilho</option>
+            <option value="Dinho">Dinho</option>
+            <option value="Luiz">Luiz</option>
+            <option value="Lucas">Lucas</option>
+          </select>
         </div>
 
         <div class="row g-2 mb-2">
           <div class="col-6">
-            <label class="form-label small text-muted fw-bold">Tipo de Serviço:</label>
-            <select id="motMaintTipo" class="form-select">
+            <label class="form-label small text-muted fw-bold">Data:</label>
+            <input type="date" id="filtroEscalaData" class="form-control" onchange="aplicarFiltrosEscalaGeralAdm()">
+          </div>
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Buscar Paciente:</label>
+            <input type="text" id="filtroEscalaPaciente" class="form-control" placeholder="Nome..." oninput="aplicarFiltrosEscalaGeralAdm()">
+          </div>
+        </div>
+
+        <button class="btn btn-sm btn-outline-secondary w-100 rounded-pill mt-1" onclick="limparFiltrosEscalaGeralAdm()">
+          Limpar Filtros
+        </button>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+        <span class="small fw-bold text-muted">Resultados Agrupados:</span>
+        <span class="badge bg-dark rounded-pill" id="totalViagensBadgeAdm">0 viagens</span>
+      </div>
+
+      <div id="containerRotasAgrupadasAdm"></div>
+    </div>
+
+    <!-- SEÇÃO ADM 3: MANUTENÇÃO DE FROTA -->
+    <div id="adm-sec-manutencao" class="sub-secao-adm d-none">
+      <div class="modern-card">
+        <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-tools text-warning"></i> Registrar Manutenção</h6>
+        <p class="text-muted small mb-3">Lançamento de preventivas e corretivas.</p>
+
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Veículo:</label>
+          <select id="manutVeiculoSelect" class="form-select">
+            <option value="Van (Placa: ABC-1234)">Van (ABC-1234)</option>
+            <option value="Citroën C3 (Placa: BRA-2021)">Citroën C3 (BRA-2021)</option>
+            <option value="Fiat Cronos (Placa: SAU-4567)">Fiat Cronos (SAU-4567)</option>
+            <option value="Ambulância 1 (UTI - AMB-0101)">Ambulância 1 (AMB-0101)</option>
+          </select>
+        </div>
+
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Data:</label>
+            <input type="date" id="manutData" class="form-control">
+          </div>
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Serviço:</label>
+            <select id="manutTipoServico" class="form-select">
               <option value="Troca de Óleo e Filtros">Troca de Óleo e Filtros</option>
+              <option value="Sistema de Freios">Freios (Pastilhas/Discos)</option>
+              <option value="Pneus e Alinhamento">Pneus e Alinhamento</option>
               <option value="Revisão Periódica">Revisão Periódica</option>
-              <option value="Freios / Pastilhas">Freios / Pastilhas</option>
-              <option value="Suspensão / Amortecedores">Suspensão / Amortecedores</option>
-              <option value="Pneus / Alinhamento">Pneus / Alinhamento</option>
-              <option value="Outros Reparos">Outros Reparos</option>
+              <option value="Suspensão">Suspensão</option>
             </select>
           </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Descrição do Reparo:</label>
+          <input type="text" id="manutDescricao" class="form-control" placeholder="Ex: Substituição das pastilhas dianteiras...">
+        </div>
+
+        <div class="row g-2 mb-2">
           <div class="col-6">
-            <label class="form-label small text-muted fw-bold">Valor do Serviço (R$):</label>
-            <input type="number" step="0.01" id="motMaintValor" class="form-control" placeholder="R$ 0,00">
+            <label class="form-label small text-muted fw-bold">Valor (R$):</label>
+            <input type="number" id="manutValor" class="form-control" placeholder="0,00">
           </div>
-        </div>
-
-        <div class="mb-2">
-          <label class="form-label small text-muted fw-bold">O que foi feito (Detalhes):</label>
-          <textarea id="motMaintDescricao" class="form-control" rows="2" placeholder="Ex: Troca de 6L óleo 5W30 sintético e filtro de óleo..."></textarea>
-        </div>
-
-        <div class="mb-2">
-          <label class="form-label small text-muted fw-bold">Próxima Troca / Revisão Prevista (Km):</label>
-          <input type="number" id="motMaintProximoKm" class="form-control" placeholder="Ex: 55000">
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Oficina:</label>
+            <input type="text" id="manutLocal" class="form-control" placeholder="Nome da Auto Center">
+          </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label small text-muted fw-bold">Foto da Nota Fiscal / Ordem de Serviço:</label>
-          <input type="file" id="motMaintFoto" accept="image/*" capture="environment" class="form-control">
+          <label class="form-label small text-muted fw-bold">Autorizado Por:</label>
+          <input type="text" id="manutAutorizador" class="form-control" placeholder="Ex: Coordenação de Transportes">
         </div>
 
-        <button class="btn btn-warning w-100 btn-action fw-bold" type="button" onclick="salvarManutencaoMotorista()">
-          <i class="bi bi-save"></i> Gravar Manutenção no Sistema
+        <button class="btn-brand-dark" onclick="salvarManutencaoAdm()">
+          <i class="bi bi-save-fill"></i> Gravar Registro de Manutenção
         </button>
       </div>
+
+      <div class="modern-card-dark mb-3">
+        <span class="text-white-50 small">Total Gasto em Manutenções:</span>
+        <h3 class="text-white fw-bold m-0" id="totalGastoManutencaoAdm">R$ 0,00</h3>
+      </div>
+
+      <h6 class="fw-bold small text-muted px-1 mb-2">Histórico de Ordens de Serviço:</h6>
+      <div id="historicoManutencoesAdm"></div>
     </div>
 
-    <!-- SCANNER & FOTO COM LOCALIZAÇÃO -->
-    <div id="sec-registros" class="app-section d-none">
-      <div class="card card-custom p-3 border-start border-4 border-info">
-        <h6 class="fw-bold text-info-emphasis"><i class="bi bi-file-earmark-pdf"></i> Escanear Documento / Guia Médica</h6>
-        <div class="mb-2">
-          <label class="form-label small text-muted">Tipo de Documento:</label>
-          <select id="docTipo" class="form-select">
-            <option value="Guia de Encaminhamento">Guia de Encaminhamento</option>
-            <option value="Pedido de Exame / Laudo">Pedido de Exame / Laudo</option>
-            <option value="Prontuário de Transporte Ambulância">Prontuário de Transporte Ambulância</option>
-            <option value="Atestado / Receita">Atestado / Receita</option>
-            <option value="Nota / Comprovante">Nota / Comprovante</option>
+    <!-- SEÇÃO ADM 4: CENTRAL DE RELATÓRIOS -->
+    <div id="adm-sec-relatorios" class="sub-secao-adm d-none">
+      <div class="modern-card">
+        <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-bar-graph text-success"></i> Relatórios da Gestão</h6>
+        <p class="text-muted small">Compilação para auditoria e prestação de contas.</p>
+
+        <div class="mb-3">
+          <label class="form-label small text-muted fw-bold">Selecione o Tema:</label>
+          <select id="admRelTemaSelect" class="form-select">
+            <option value="ConsolidadoGeral">1. Resumo Geral (Viagens, Manutenção & Frota)</option>
+            <option value="PresencaPacientes">2. Auditoria de Presença e Embarque (com GPS)</option>
+            <option value="ManutencaoOficinas">3. Relatório de Manutenções e Oficinas</option>
           </select>
         </div>
-        <input type="file" id="docScannerInput" accept="image/*" capture="environment" class="form-control mb-2" onchange="escanearDocumentoProcess(event)">
-        <canvas id="docCanvas" class="canvas-preview"></canvas>
-        <div id="docStatusBox" class="alert alert-success py-2 small mt-2 d-none"></div>
-        <button class="btn btn-info text-white w-100 mt-2 btn-action" type="button" onclick="salvarDocumentoEscaneado()">
-          <i class="bi bi-save"></i> Salvar Documento Digitalizado
-        </button>
-        <div id="listaDocsDigitalizados" class="mt-2"></div>
-      </div>
 
-      <div class="card card-custom p-3">
-        <h6 class="fw-bold mb-2"><i class="bi bi-camera"></i> Foto de Presença com Localização</h6>
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" class="form-control mb-2" onchange="processarFotoEndereco(event)">
-        <canvas id="photoCanvas" class="canvas-preview"></canvas>
-        <div id="geoInfoBox" class="alert alert-primary py-2 small mt-2 d-none"></div>
-        <div class="mt-2">
-          <label class="form-label small text-muted">Observações da Viagem:</label>
-          <textarea id="obsViagemInput" class="form-control" rows="2" placeholder="Ex: Paciente aguardando liberação na recepção..."></textarea>
-        </div>
-        <button class="btn btn-success w-100 mt-2 btn-action" type="button" onclick="salvarRegistroCampo()">
-          <i class="bi bi-save"></i> Salvar Registro com Localização
+        <button class="btn-brand-dark mb-3" onclick="gerarRelatorioAdm()">
+          <i class="bi bi-funnel"></i> Compilar Relatório
         </button>
+
+        <div id="areaResultadoRelatorioAdm" class="p-3 bg-light rounded d-none border">
+          <div class="text-center border-bottom pb-2 mb-2">
+            <h6 class="fw-bold m-0" id="tituloRelatorioAdm">RELATÓRIO OFICIAL</h6>
+            <small class="text-muted">Secretaria Municipal de Saúde • Gameleira</small>
+          </div>
+          <div id="conteudoRelatorioAdm" class="small mb-3"></div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-dark flex-fill rounded-pill fw-bold" onclick="baixarPdfRelatorioAdm()">
+              <i class="bi bi-file-earmark-pdf-fill text-danger"></i> Baixar PDF
+            </button>
+            <button class="btn btn-sm btn-success flex-fill rounded-pill fw-bold" onclick="baixarPlanilhaCSV()">
+              <i class="bi bi-file-earmark-spreadsheet-fill"></i> Baixar CSV
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- SEÇÃO DIÁRIO DE BORDO & CALENDÁRIO MENSAL -->
-    <div id="sec-relatorio" class="app-section d-none">
-      <div class="card card-custom p-3 border-start border-4 border-primary">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="fw-bold text-primary m-0"><i class="bi bi-calendar3"></i> Calendário do Diário de Bordo</h6>
-          <span class="badge bg-light text-primary border">Consulta Diária</span>
-        </div>
-        <p class="text-muted small mb-2">Selecione uma data para consultar o diário de bordo ou registrar dia sem viagem:</p>
-        
-        <div class="row g-2 mb-3">
-          <div class="col-8">
-            <input type="date" id="calendarioDataConsulta" class="form-control form-control-lg" onchange="consultarDiarioPorData()">
-          </div>
-          <div class="col-4">
-            <button class="btn btn-outline-primary w-100 h-100 fw-bold" onclick="consultarDiarioPorData()">
-              <i class="bi bi-search"></i> Ver
-            </button>
-          </div>
-        </div>
-
-        <div class="p-2 bg-light rounded border">
-          <div class="d-flex justify-content-between align-items-center">
-            <small class="fw-bold text-dark"><i class="bi bi-slash-circle"></i> Não viajou nesta data?</small>
-            <button class="btn btn-sm btn-outline-secondary py-0" type="button" data-bs-toggle="collapse" data-bs-target="#boxSemViagem">
-              Justificar Dia
-            </button>
-          </div>
-          <div class="collapse mt-2" id="boxSemViagem">
-            <div class="mb-2">
-              <label class="form-label small text-muted">Motivo / Situação:</label>
-              <select id="motivoSemViagem" class="form-select form-select-sm">
-                <option value="Plantão na Base / Serviços Administrativos">Plantão na Base / Serviços Administrativos</option>
-                <option value="Veículo em Manutenção / Oficina">Veículo em Manutenção / Oficina</option>
-                <option value="Escala Livre / Sem Pacientes Agendados">Escala Livre / Sem Pacientes Agendados</option>
-                <option value="Folga Regulamentar">Folga Regulamentar</option>
-                <option value="Atestado / Licença Médica">Atestado / Licença Médica</option>
-              </select>
-            </div>
-            <button class="btn btn-secondary btn-sm w-100" type="button" onclick="registrarDiaSemViagem()">
-              <i class="bi bi-save"></i> Gravar Dia Sem Viagem no Diário
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card card-custom p-3" id="printableReport">
-        <div class="text-center border-bottom pb-2 mb-3">
-          <h6 class="fw-bold m-0">DIÁRIO DE BORDO - TRANSPORTE DA SAÚDE</h6>
-          <small class="text-muted">Boletim Diário Oficial de Deslocamento & Presença</small>
-        </div>
-        
-        <div class="alert alert-info py-2 small mb-3 text-center" id="repStatusDiaBanner">
-          <i class="bi bi-info-circle"></i> Exibindo dados do dia: <b id="repDataVisualizada">--/--/----</b>
-        </div>
-
-        <table class="table table-bordered small">
-          <tbody>
-            <tr><th>Motorista:</th><td id="repMotorista">Paulo Portilho</td></tr>
-            <tr><th>Data Consultada:</th><td id="repData">--/--/----</td></tr>
-            <tr><th>Situação do Dia:</th><td id="repSituacaoDia"><span class="badge bg-success">Viagem Realizada</span></td></tr>
-            <tr><th>Veículo Utilizado:</th><td id="repVeiculo">Van (Placa: ABC-1234)</td></tr>
-            <tr><th>Vistoria / Avaria:</th><td id="repAvariaVistoria"><span class="text-success fw-bold">Veículo Íntegro</span></td></tr>
-            <tr><th>Ponto Entrada / Chave:</th><td id="repEntrada">Pendente</td></tr>
-            <tr><th>Ponto Saída / Chave:</th><td id="repSaida">Pendente</td></tr>
-            <tr><th>Quilometragem:</th><td id="repKm">Inicial: - | Final: - | <b class="text-success">Total: 0 Km</b></td></tr>
-            <tr><th>Abastecimento Final:</th><td id="repAbastecimento">Nenhum lançamento</td></tr>
-            <tr><th>Documentos Escaneados:</th><td id="repDocsCount">0 digitalizados</td></tr>
-          </tbody>
-        </table>
-        
-        <h6 class="fw-bold mt-2 small">Controle de Embarque & Comprovação GPS/Hora:</h6>
-        <div id="repViagensLista" class="small mb-2"></div>
-      </div>
-
-      <button class="btn btn-primary w-100 btn-action mb-2" type="button" onclick="window.print()">
-        <i class="bi bi-printer"></i> Imprimir / Salvar PDF Deste Dia
-      </button>
-      <button class="btn btn-outline-success w-100" type="button" onclick="sincronizarComPlanilha()">
-        <i class="bi bi-cloud-arrow-up"></i> Sincronizar Histórico com Planilha
-      </button>
+    <!-- BARRA INFERIOR ADM -->
+    <div class="floating-pill-nav" id="navAdm">
+      <button class="pill-nav-btn active" title="Lançar Escala" onclick="trocarAbaAdm('adm-sec-cadastrar', this)"><i class="bi bi-calendar-plus-fill"></i></button>
+      <button class="pill-nav-btn" title="Escala Geral" onclick="trocarAbaAdm('adm-sec-rotasgerais', this)"><i class="bi bi-list-task"></i></button>
+      <button class="pill-nav-btn" title="Manutenção" onclick="trocarAbaAdm('adm-sec-manutencao', this)"><i class="bi bi-tools"></i></button>
+      <button class="pill-nav-btn" title="Relatórios" onclick="trocarAbaAdm('adm-sec-relatorios', this)"><i class="bi bi-file-earmark-bar-graph-fill"></i></button>
     </div>
-
   </div>
 
-  <!-- NAVEGAÇÃO MOTORISTA -->
-  <div class="nav-bottom">
-    <button class="active" type="button" onclick="showTab('dashboard', this)">
-      <i class="bi bi-speedometer2"></i>
-      Início
-    </button>
-    <button type="button" onclick="showTab('turno', this)">
-      <i class="bi bi-clock-history"></i>
-      Ponto/Frota
-    </button>
-    <button type="button" onclick="showTab('rotas', this)">
-      <i class="bi bi-map"></i>
-      Rotas
-    </button>
-    <button type="button" onclick="showTab('manutencao-motorista', this)">
-      <i class="bi bi-tools"></i>
-      Manutenção
-    </button>
-    <button type="button" onclick="showTab('registros', this)">
-      <i class="bi bi-file-earmark-pdf"></i>
-      Scanner/Foto
-    </button>
-    <button type="button" onclick="showTab('relatorio', this)">
-      <i class="bi bi-calendar-check"></i>
-      Diário/Mês
-    </button>
-  </div>
 </div>
 
 <script>
-  let appData = {
-    motoristaLogado: null,
-    perfilAtual: null,
+  // ==========================================================
+  // ESTADO GLOBAL COMPLETO (MOTORISTA + GESTÃO)
+  // ==========================================================
+  const ESTADO_INICIAL = {
+    usuarioAtivo: null,
+    perfilAtivo: null,
     veiculoAtivo: "Van (Placa: ABC-1234)",
-    dataHoje: new Date().toISOString().split('T')[0],
-    dataSelecionadaConsulta: new Date().toISOString().split('T')[0],
-    
-    historicoTurnos: {},
-    diasSemViagem: {},
-
-    // Metas e Histórico de Manutenção alimentado pelos Motoristas
-    manutencaoMetas: {
-      "Van (Placa: ABC-1234)": { oleoKmAlvo: 48000, revisaoKmAlvo: 50000, ultimoServico: "Troca de Óleo aos 40.000 Km (R$ 380,00)" },
-      "Citroën C3 (Placa: BRA-2021)": { oleoKmAlvo: 35000, revisaoKmAlvo: 40000, ultimoServico: "Revisão Geral aos 30.000 Km (R$ 620,00)" }
-    },
-
-    historicoServicos: [
+    kmInicial: 45200,
+    kmFinal: 45320,
+    horaEntrada: "07:00",
+    horaSaida: "17:30",
+    litrosAbastecidos: 12,
+    viagens: [
       {
+        id: "V-101",
+        data: new Date().toISOString().split('T')[0],
+        motorista: "Paulo Portilho",
         veiculo: "Van (Placa: ABC-1234)",
-        data: "2026-08-10",
-        motorista: "Paulo",
-        kmFeito: 40000,
-        tipo: "Troca de Óleo e Filtros",
-        valor: 380.00,
-        descricao: "6L Óleo 5W30 Sintético e filtro de óleo.",
-        proximoKm: 48000
+        paciente: "João da Silva",
+        fone: "62999990001",
+        horario: "07:30",
+        origem: "Gameleira de Goiás",
+        destino: "Hospital das Clínicas, Goiânia",
+        presenca: "Embarcado",
+        registroGps: "Confirmado às 07:32 (Gameleira de Goiás)"
+      },
+      {
+        id: "V-102",
+        data: new Date().toISOString().split('T')[0],
+        motorista: "Paulo Portilho",
+        veiculo: "Van (Placa: ABC-1234)",
+        paciente: "Maria Oliveira",
+        fone: "62999990002",
+        horario: "08:15",
+        origem: "Gameleira de Goiás",
+        destino: "Policlínica Estadual, Goiânia",
+        presenca: "Aguardando",
+        registroGps: null
       }
     ],
-
-    entrada: null,
-    saida: null,
-    chaveEntrada: false,
-    chaveSaida: false,
-    kmInicial: 0,
-    kmFinal: 0,
-    avariaVistoriaInicial: "Veículo íntegro / Sem avarias prévias",
-    abastecimento: { valor: 0, litros: 0, tipo: "Diesel S10" },
-    documentosEscaneados: [],
-    alertasManutencao: [],
-    observacoes: [],
-    fotosGPS: [],
-    
-    veiculosCadastrados: [
-      "Van (Placa: ABC-1234)", "Citroën C3 (Placa: BRA-2021)", "Fiat Cronos (Placa: SAU-4567)",
-      "Chevrolet Spin (Placa: HOS-8901)", "VW Gol 1 (Placa: MED-1122)", "VW Gol 2 (Placa: ENF-3344)",
-      "Renault Sandero (Placa: AMB-5566)", "Renault Oroch (Placa: REG-7788)",
-      "Ambulância 1 (UTI - AMB-0101)", "Ambulância 2 (Básica - AMB-0202)"
-    ],
-
-    todasRotas: [
-      { id: "ROTA-001", data: "2026-08-27", motorista: "Paulo", veiculo: "Van (Placa: ABC-1234)", paciente: "João da Silva", fone: "62999990001", origem: "UBS Central", destino: "Hospital das Clínicas, Goiânia", horario: "07:30", obs: "Paciente cadeirante", presenca: "Aguardando", presencaInfo: null, status: "Pendente" },
-      { id: "ROTA-002", data: "2026-08-27", motorista: "Paulo", veiculo: "Van (Placa: ABC-1234)", paciente: "Maria Oliveira", fone: "62999990002", origem: "Rua 10, Centro", destino: "Policlínica Estadual, Goiânia", horario: "08:45", obs: "Retorno de consulta", presenca: "Aguardando", presencaInfo: null, status: "Pendente" }
+    manutencoes: [
+      {
+        veiculo: "Van (Placa: ABC-1234)",
+        data: new Date().toISOString().split('T')[0],
+        tipo: "Troca de Óleo e Filtros",
+        descricao: "Troca de 6L de óleo sintético 5W30 e filtro de combustível",
+        valor: 380.00,
+        local: "Auto Centro Gameleira",
+        autorizador: "Coordenação de Transportes"
+      }
     ]
   };
 
-  let contadorPacientesForm = 0;
+  let db = JSON.parse(localStorage.getItem('gameleira_transporte_codepen_v14')) || ESTADO_INICIAL;
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const salvo = localStorage.getItem('transporte_saude_db_master_v9');
-    if (salvo) {
-      try { appData = JSON.parse(salvo); } catch(e){}
-    }
-
-    const dataInput = document.getElementById('admCadData');
-    if (dataInput) dataInput.value = appData.dataHoje;
-
-    const motMaintData = document.getElementById('motMaintData');
-    if (motMaintData) motMaintData.value = appData.dataHoje;
-
-    const calInput = document.getElementById('calendarioDataConsulta');
-    if (calInput) calInput.value = appData.dataHoje;
-
-    adicionarCampoNovoPaciente();
-    atualizarTotaisManutencaoAdm();
-  });
-
-  // SIMULAÇÃO DA LEITURA INTELIGENTE (IA / OCR) DO COMPROVANTE DE COMBUSTÍVEL
-  function processarLeituraComprovanteIA(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const feedback = document.getElementById('feedbackOcrIa');
-    feedback.classList.remove('d-none');
-    feedback.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Lendo cupom fiscal com IA...`;
-
-    setTimeout(() => {
-      // Leitura automática simulada a partir do cupom
-      const valorLido = document.getElementById('abasteceReais').value || 250.00;
-      const litrosLidos = document.getElementById('abasteceLitros').value || 42.50;
-      
-      document.getElementById('abasteceReais').value = parseFloat(valorLido).toFixed(2);
-      document.getElementById('abasteceLitros').value = parseFloat(litrosLidos).toFixed(2);
-
-      feedback.className = "text-success d-block mt-1 small fw-bold";
-      feedback.innerHTML = `<i class="bi bi-check-circle-fill"></i> Leitura por IA concluída: R$ ${parseFloat(valorLido).toFixed(2)} (${parseFloat(litrosLidos).toFixed(2)} Litros)`;
-    }, 1200);
+  function persistir() {
+    localStorage.setItem('gameleira_transporte_codepen_v14', JSON.stringify(db));
   }
 
-  // FORMULÁRIO DE MANUTENÇÃO PREENCHIDO PELO MOTORISTA
-  function salvarManutencaoMotorista() {
-    const dataS = document.getElementById('motMaintData').value;
-    const kmS = parseFloat(document.getElementById('motMaintKm').value);
-    const tipo = document.getElementById('motMaintTipo').value;
-    const valor = parseFloat(document.getElementById('motMaintValor').value) || 0;
-    const desc = document.getElementById('motMaintDescricao').value.trim();
-    const proxKm = parseFloat(document.getElementById('motMaintProximoKm').value) || (kmS + 10000);
-    const veiculo = appData.veiculoAtivo;
-    const motorista = appData.motoristaLogado;
+  // ==========================================================
+  // AUTENTICAÇÃO E TROCA DE TELAS
+  // ==========================================================
+  function autenticarUsuario() {
+    const perfil = document.getElementById('selectPerfil').value;
+    db.perfilAtivo = perfil;
+    db.usuarioAtivo = perfil;
+    persistir();
 
-    if (!dataS || !kmS || !desc || valor <= 0) {
-      alert('Por favor, preencha todos os campos obrigatórios e o valor do serviço!');
-      return;
+    document.getElementById('telaLogin').classList.add('d-none');
+
+    if (perfil === 'ADM') {
+      document.getElementById('moduloAdm').classList.remove('d-none');
+      document.getElementById('moduloMotorista').classList.add('d-none');
+      inicializarTelaAdm();
+    } else {
+      document.getElementById('moduloMotorista').classList.remove('d-none');
+      document.getElementById('moduloAdm').classList.add('d-none');
+      document.getElementById('saudacaoMotorista').innerHTML = `Bom dia,<br>${perfil.split(' ')[0]}`;
+      renderizarViagensMotorista();
+      recalcularMetricasMotorista();
     }
-
-    const novoServico = {
-      veiculo,
-      data: dataS,
-      motorista,
-      kmFeito: kmS,
-      tipo,
-      valor,
-      descricao: desc,
-      proximoKm: proxKm
-    };
-
-    appData.historicoServicos.unshift(novoServico);
-
-    // Atualiza metas ativas do veículo
-    appData.manutencaoMetas[veiculo] = {
-      oleoKmAlvo: proxKm,
-      revisaoKmAlvo: proxKm + 5000,
-      ultimoServico: `${tipo} aos ${kmS} Km (R$ ${valor.toFixed(2)})`
-    };
-
-    salvarEstado();
-    atualizarDashboard();
-    atualizarTotaisManutencaoAdm();
-
-    document.getElementById('motMaintKm').value = '';
-    document.getElementById('motMaintValor').value = '';
-    document.getElementById('motMaintDescricao').value = '';
-    document.getElementById('motMaintProximoKm').value = '';
-
-    alert(`Serviço de manutenção registrado com sucesso!\nValor: R$ ${valor.toFixed(2)}\nDados enviados para o relatório da ADM.`);
   }
 
-  // ATUALIZAÇÃO DO RELATÓRIO DE MANUTENÇÃO E CONSERVAÇÃO NA ADM
-  function atualizarTotaisManutencaoAdm() {
-    const container = document.getElementById('admHistoricoManutencoesContainer');
-    const totalGastoManut = document.getElementById('admTotalGastoManutencao');
-    const totalManutBadge = document.getElementById('admTotalManutencoesBadge');
+  function efetuarLogout() {
+    db.usuarioAtivo = null;
+    db.perfilAtivo = null;
+    persistir();
+    document.getElementById('moduloMotorista').classList.add('d-none');
+    document.getElementById('moduloAdm').classList.add('d-none');
+    document.getElementById('telaLogin').classList.remove('d-none');
+  }
 
-    let totalGasto = 0;
-    appData.historicoServicos.forEach(s => totalGasto += (s.valor || 0));
+  function trocarAbaMotorista(abaId, btn) {
+    document.querySelectorAll('.sub-secao-motorista').forEach(el => el.classList.add('d-none'));
+    document.querySelectorAll('#navMotorista .pill-nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(abaId).classList.remove('d-none');
+    btn.classList.add('active');
+  }
 
-    if (totalGastoManut) totalGastoManut.innerText = `R$ ${totalGasto.toFixed(2)}`;
-    if (totalManutBadge) totalManutBadge.innerText = `${appData.historicoServicos.length} serviços`;
+  function trocarAbaAdm(abaId, btn) {
+    document.querySelectorAll('.sub-secao-adm').forEach(el => el.classList.add('d-none'));
+    document.querySelectorAll('#navAdm .pill-nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(abaId).classList.remove('d-none');
+    btn.classList.add('active');
 
-    if (!container) return;
+    if (abaId === 'adm-sec-rotasgerais') aplicarFiltrosEscalaGeralAdm();
+    if (abaId === 'adm-sec-manutencao') renderizarManutencoesAdm();
+  }
 
-    if (appData.historicoServicos.length === 0) {
-      container.innerHTML = '<span class="text-muted">Nenhum serviço de manutenção registrado pelos motoristas.</span>';
-      return;
-    }
-
+  // ==========================================================
+  // 1. MOTORISTA: FUNÇÕES E EMBARQUE
+  // ==========================================================
+  function renderizarViagensMotorista() {
+    const container = document.getElementById('containerListaEmbarque');
     container.innerHTML = '';
-    appData.historicoServicos.forEach(s => {
+
+    const minhasViagens = db.viagens.filter(v => v.motorista === db.usuarioAtivo);
+    document.getElementById('badgeTotalPassageiros').innerText = minhasViagens.length;
+
+    if (minhasViagens.length === 0) {
+      container.innerHTML = '<div class="modern-card text-center text-muted small py-3">Nenhum passageiro na sua rota hoje.</div>';
+      return;
+    }
+
+    document.getElementById('dashDestino').innerText = minhasViagens[0].destino.split(',')[0];
+    document.getElementById('dashVeiculoNome').innerText = db.veiculoAtivo;
+    document.getElementById('repVeiculoNome').innerText = db.veiculoAtivo;
+    document.getElementById('repNomeMotorista').innerText = db.usuarioAtivo;
+
+    minhasViagens.forEach((r, idx) => {
+      let corBadge = r.presenca === 'Embarcado' ? 'bg-success' : (r.presenca === 'Não Embarcou' ? 'bg-danger' : 'bg-warning text-dark');
+
       container.innerHTML += `
-        <div class="p-2 border-bottom">
-          <div class="d-flex justify-content-between">
-            <b>${s.veiculo}</b>
-            <span class="badge bg-danger">R$ ${s.valor.toFixed(2)}</span>
+        <div class="card-embarque-motorista">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <b>#${idx+1} ${r.paciente}</b>
+            <span class="badge ${corBadge} rounded-pill">${r.presenca}</span>
           </div>
-          <div class="text-primary small fw-bold">Serviço: ${s.tipo} | Realizado em: ${s.data} por ${s.motorista} (Km: ${s.kmFeito})</div>
-          <div class="text-secondary small mt-1"><b>Descrição:</b> ${s.descricao}</div>
-          <div class="small mt-1 text-muted">Meta próxima revisão: ${s.proximoKm} Km</div>
-        </div>`;
+          <div class="small text-muted mb-2">
+            🕒 ${r.horario} | 🚐 ${r.veiculo}<br>
+            📍 ${r.origem} ➔ ${r.destino}
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <button class="btn btn-sm ${r.presenca === 'Embarcado' ? 'btn-success' : 'btn-outline-success'} w-100 rounded-pill fw-bold" onclick="marcarPresencaMotorista('${r.id}', 'Embarcado')">
+                <i class="bi bi-check2"></i> Embarcou
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="btn btn-sm ${r.presenca === 'Não Embarcou' ? 'btn-danger' : 'btn-outline-danger'} w-100 rounded-pill fw-bold" onclick="marcarPresencaMotorista('${r.id}', 'Não Embarcou')">
+                <i class="bi bi-x"></i> Não Foi
+              </button>
+            </div>
+          </div>
+          ${r.registroGps ? `<small class="d-block text-primary mt-2" style="font-size: 10.5px;"><i class="bi bi-geo-alt"></i> ${r.registroGps}</small>` : ''}
+        </div>
+      `;
     });
   }
 
-  // CENTRAL DE RELATÓRIOS DA ADM (GERADOR GERAL)
+  function marcarPresencaMotorista(id, status) {
+    const item = db.viagens.find(v => v.id === id);
+    if (!item) return;
+
+    item.presenca = status;
+    item.registroGps = `${status} às ${new Date().toLocaleTimeString('pt-BR')} (Gameleira de Goiás)`;
+    persistir();
+    renderizarViagensMotorista();
+  }
+
+  function atualizarVeiculoAtivoMotorista() {
+    db.veiculoAtivo = document.getElementById('motVeiculoSelect').value;
+    document.getElementById('dashVeiculoNome').innerText = db.veiculoAtivo;
+    document.getElementById('repVeiculoNome').innerText = db.veiculoAtivo;
+    persistir();
+  }
+
+  function registrarPontoEntradaMotorista() {
+    const km = parseFloat(document.getElementById('inputKmInicial').value);
+    if (!km) { alert('Informe o Km Inicial'); return; }
+    db.kmInicial = km;
+    db.horaEntrada = new Date().toLocaleTimeString('pt-BR');
+    document.getElementById('horaEntradaFeedback').innerText = `Entrada às ${db.horaEntrada}`;
+    persistir();
+    recalcularMetricasMotorista();
+  }
+
+  function simularCupomMotorista() {
+    document.getElementById('inputValorAbastece').value = "180.50";
+    document.getElementById('inputLitrosAbastece').value = "30.00";
+    recalcularMetricasMotorista();
+  }
+
+  function recalcularMetricasMotorista() {
+    const kmI = parseFloat(document.getElementById('inputKmInicial').value) || db.kmInicial || 0;
+    const kmF = parseFloat(document.getElementById('inputKmFinal').value) || db.kmFinal || 0;
+    const litros = parseFloat(document.getElementById('inputLitrosAbastece').value) || db.litrosAbastecidos || 0;
+
+    let dist = 0;
+    if (kmF >= kmI && kmI > 0) dist = kmF - kmI;
+
+    let media = 0;
+    if (dist > 0 && litros > 0) media = (dist / litros).toFixed(2);
+
+    document.getElementById('badgeKmTurno').innerText = `★ ${dist} Km`;
+    document.getElementById('badgeMediaConsumo').innerText = media > 0 ? `Média: ${media} Km/L` : `Média: -- Km/L`;
+    document.getElementById('resumoCalculoTurno').innerText = `Distância: ${dist} Km | Média: ${media > 0 ? media + ' Km/L' : '-- Km/L'}`;
+
+    document.getElementById('repKmTotal').innerText = `${dist} Km`;
+    document.getElementById('repMediaAutonomia').innerText = media > 0 ? `${media} Km/L` : 'Não apurada';
+    document.getElementById('repJornadaHoras').innerText = `${db.horaEntrada || '07:00'} às ${db.horaSaida || '17:30'}`;
+  }
+
+  function encerrarTurnoMotorista() {
+    const kmF = parseFloat(document.getElementById('inputKmFinal').value);
+    if (!kmF) { alert('Informe o Km Final'); return; }
+    db.kmFinal = kmF;
+    db.horaSaida = new Date().toLocaleTimeString('pt-BR');
+    persistir();
+    recalcularMetricasMotorista();
+    alert(`Turno finalizado às ${db.horaSaida}! Boletim oficial pronto.`);
+  }
+
+  function processarFotoComCarimbo(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.getElementById('canvasCarimbo');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        ctx.fillStyle = "rgba(0,0,0,0.75)";
+        ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+        ctx.fillStyle = "#cbfb45";
+        ctx.font = "bold 20px sans-serif";
+        ctx.fillText(`TRANSPORTE SAÚDE • GAMELEIRA DE GOIÁS`, 16, canvas.height - 40);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "15px sans-serif";
+        ctx.fillText(`Condutor: ${db.usuarioAtivo} | ${new Date().toLocaleString('pt-BR')}`, 16, canvas.height - 16);
+
+        canvas.style.display = 'block';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function salvarFotoComprovante() {
+    alert('Comprovante arquivado com sucesso no diário operacional.');
+    document.getElementById('canvasCarimbo').style.display = 'none';
+    document.getElementById('inputObsFoto').value = '';
+  }
+
+  function gerarPdfBoletimMotorista() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("PREFEITURA MUNICIPAL DE GAMELEIRA DE GOIÁS", 20, 20);
+    doc.setFontSize(11);
+    doc.text("SECRETARIA MUNICIPAL DE SAÚDE - BOLETIM DO CONDUTOR", 20, 28);
+    doc.line(20, 32, 190, 32);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Motorista: ${db.usuarioAtivo}`, 20, 42);
+    doc.text(`Veículo: ${db.veiculoAtivo}`, 20, 48);
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 54);
+    doc.text(`Jornada: ${document.getElementById('repJornadaHoras').innerText}`, 20, 60);
+    doc.text(`Distância: ${document.getElementById('repKmTotal').innerText}`, 20, 66);
+    doc.text(`Média: ${document.getElementById('repMediaAutonomia').innerText}`, 20, 72);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Passageiros Transportados:", 20, 82);
+    doc.setFont("helvetica", "normal");
+
+    let y = 90;
+    db.viagens.filter(v => v.motorista === db.usuarioAtivo).forEach((v, i) => {
+      doc.text(`${i+1}. ${v.paciente} - Status: [${v.presenca}]`, 20, y);
+      y += 6;
+      doc.text(`   ${v.origem} -> ${v.destino} (${v.horario})`, 20, y);
+      y += 8;
+    });
+
+    doc.save(`Boletim_${db.usuarioAtivo}_${new Date().toISOString().split('T')[0]}.pdf`);
+  }
+
+  // ==========================================================
+  // 2. GESTÃO & REGULAÇÃO (ADM): AS 4 SEÇÕES
+  // ==========================================================
+  let contadorFormPacientesAdm = 0;
+
+  function inicializarTelaAdm() {
+    const dataInput = document.getElementById('admCadData');
+    if (dataInput) dataInput.value = new Date().toISOString().split('T')[0];
+
+    const dataManut = document.getElementById('manutData');
+    if (dataManut) dataManut.value = new Date().toISOString().split('T')[0];
+
+    const container = document.getElementById('listaPacientesDinamicosAdm');
+    container.innerHTML = '';
+    contadorFormPacientesAdm = 0;
+    adicionarCampoNovoPacienteAdm();
+
+    renderizarManutencoesAdm();
+  }
+
+  // SEÇÃO ADM 1: Lançar Escala
+  function adicionarCampoNovoPacienteAdm() {
+    contadorFormPacientesAdm++;
+    const container = document.getElementById('listaPacientesDinamicosAdm');
+    const divId = `pacienteItemAdm_${contadorFormPacientesAdm}`;
+
+    const html = `
+      <div class="card-paciente-item" id="${divId}">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="badge bg-dark rounded-pill" style="font-size: 10px;">Passageiro #${contadorFormPacientesAdm}</span>
+          ${contadorFormPacientesAdm > 1 ? `<button class="btn btn-sm text-danger py-0" onclick="document.getElementById('${divId}').remove()"><i class="bi bi-trash"></i></button>` : ''}
+        </div>
+        <input type="text" class="form-control form-control-sm mb-1 adm-pac-nome" placeholder="Nome Completo do Paciente">
+        <div class="row g-1 mb-1">
+          <div class="col-6"><input type="text" class="form-control form-control-sm adm-pac-fone" placeholder="WhatsApp"></div>
+          <div class="col-6"><input type="time" class="form-control form-control-sm adm-pac-hora" value="07:30"></div>
+        </div>
+        <input type="text" class="form-control form-control-sm mb-1 adm-pac-origem" placeholder="Origem" value="Gameleira de Goiás">
+        <input type="text" class="form-control form-control-sm adm-pac-destino" placeholder="Destino (Ex: Hospital das Clínicas, Goiânia)">
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+  }
+
+  function salvarTodaEscalaAdm() {
+    const motorista = document.getElementById('admCadMotorista').value;
+    const dataV = document.getElementById('admCadData').value || new Date().toISOString().split('T')[0];
+    const veiculo = document.getElementById('admCadVeiculo').value;
+
+    const cards = document.querySelectorAll('#listaPacientesDinamicosAdm .card-paciente-item');
+    let gravados = 0;
+
+    cards.forEach(c => {
+      const nome = c.querySelector('.adm-pac-nome').value.trim();
+      const fone = c.querySelector('.adm-pac-fone').value.trim() || '62999990000';
+      const hora = c.querySelector('.adm-pac-hora').value || '07:30';
+      const origem = c.querySelector('.adm-pac-origem').value.trim() || 'Gameleira de Goiás';
+      const destino = c.querySelector('.adm-pac-destino').value.trim() || 'Goiânia';
+
+      if (nome) {
+        db.viagens.push({
+          id: "V-" + Date.now().toString().slice(-4) + Math.floor(Math.random()*10),
+          data: dataV,
+          motorista,
+          veiculo,
+          paciente: nome,
+          fone,
+          horario: hora,
+          origem,
+          destino,
+          presenca: "Aguardando",
+          registroGps: null
+        });
+        gravados++;
+      }
+    });
+
+    if (gravados === 0) {
+      alert('Preencha o nome de pelo menos 1 passageiro!');
+      return;
+    }
+
+    persistir();
+    inicializarTelaAdm();
+    alert(`Escala salva! ${gravados} paciente(s) adicionados para ${motorista}.`);
+  }
+
+  // SEÇÃO ADM 2: Escala Geral Consolidada
+  function aplicarFiltrosEscalaGeralAdm() {
+    const motFiltro = document.getElementById('filtroEscalaMotorista').value;
+    const dataFiltro = document.getElementById('filtroEscalaData').value;
+    const pacFiltro = document.getElementById('filtroEscalaPaciente').value.trim().toLowerCase();
+
+    const filtradas = db.viagens.filter(v => {
+      let cMot = (motFiltro === 'TODOS' || v.motorista === motFiltro);
+      let cData = (!dataFiltro || v.data === dataFiltro);
+      let cPac = (!pacFiltro || v.paciente.toLowerCase().includes(pacFiltro));
+      return cMot && cData && cPac;
+    });
+
+    document.getElementById('totalViagensBadgeAdm').innerText = `${filtradas.length} viagens`;
+
+    const container = document.getElementById('containerRotasAgrupadasAdm');
+    container.innerHTML = '';
+
+    if (filtradas.length === 0) {
+      container.innerHTML = '<div class="modern-card text-center text-muted small py-3">Nenhum registro encontrado com estes filtros.</div>';
+      return;
+    }
+
+    const agrupadas = {};
+    filtradas.forEach(v => {
+      if (!agrupadas[v.motorista]) agrupadas[v.motorista] = [];
+      agrupadas[v.motorista].push(v);
+    });
+
+    Object.keys(agrupadas).forEach(mot => {
+      let linhas = '';
+      agrupadas[mot].forEach(v => {
+        let corBadge = v.presenca === 'Embarcado' ? 'bg-success' : (v.presenca === 'Não Embarcou' ? 'bg-danger' : 'bg-secondary');
+        linhas += `
+          <div class="p-2 border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+              <b>${v.paciente}</b>
+              <span class="badge ${corBadge} rounded-pill" style="font-size: 10px;">${v.presenca}</span>
+            </div>
+            <div class="text-muted" style="font-size: 11px;">
+              🕒 ${v.horario} | 🚐 ${v.veiculo} | 📅 ${v.data}
+            </div>
+            <div class="text-primary fw-bold" style="font-size: 11px;">
+              ${v.origem} ➔ ${v.destino}
+            </div>
+            ${v.registroGps ? `<div class="text-danger" style="font-size: 10px;">${v.registroGps}</div>` : ''}
+            <div class="d-flex gap-2 mt-2">
+              <button class="btn btn-sm btn-outline-dark rounded-pill py-0 px-2" style="font-size: 10px;" onclick="editarViagemAdm('${v.id}')"><i class="bi bi-pencil"></i> Editar</button>
+              <button class="btn btn-sm btn-outline-danger rounded-pill py-0 px-2" style="font-size: 10px;" onclick="excluirViagemAdm('${v.id}')"><i class="bi bi-trash"></i> Excluir</button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML += `
+        <div class="motorista-group-box">
+          <div class="motorista-group-header">
+            <span><i class="bi bi-person-fill text-primary"></i> ${mot}</span>
+            <span class="badge bg-dark rounded-pill">${agrupadas[mot].length}</span>
+          </div>
+          ${linhas}
+        </div>
+      `;
+    });
+  }
+
+  function limparFiltrosEscalaGeralAdm() {
+    document.getElementById('filtroEscalaMotorista').value = 'TODOS';
+    document.getElementById('filtroEscalaData').value = '';
+    document.getElementById('filtroEscalaPaciente').value = '';
+    aplicarFiltrosEscalaGeralAdm();
+  }
+
+  function editarViagemAdm(id) {
+    const v = db.viagens.find(item => item.id === id);
+    if (!v) return;
+
+    const novoNome = prompt('Nome do paciente:', v.paciente);
+    if (!novoNome) return;
+    const novoDestino = prompt('Destino:', v.destino);
+    if (!novoDestino) return;
+
+    v.paciente = novoNome.trim();
+    v.destino = novoDestino.trim();
+    persistir();
+    aplicarFiltrosEscalaGeralAdm();
+    alert('Viagem atualizada com sucesso!');
+  }
+
+  function excluirViagemAdm(id) {
+    if (!confirm('Deseja realmente excluir esta viagem?')) return;
+    db.viagens = db.viagens.filter(v => v.id !== id);
+    persistir();
+    aplicarFiltrosEscalaGeralAdm();
+  }
+
+  // SEÇÃO ADM 3: Manutenção de Frota
+  function salvarManutencaoAdm() {
+    const veiculo = document.getElementById('manutVeiculoSelect').value;
+    const data = document.getElementById('manutData').value;
+    const tipo = document.getElementById('manutTipoServico').value;
+    const descricao = document.getElementById('manutDescricao').value.trim();
+    const valor = parseFloat(document.getElementById('manutValor').value) || 0;
+    const local = document.getElementById('manutLocal').value.trim();
+    const autorizador = document.getElementById('manutAutorizador').value.trim();
+
+    if (!descricao || valor <= 0 || !local) {
+      alert('Preencha a descrição, valor e oficina!');
+      return;
+    }
+
+    db.manutencoes.unshift({
+      veiculo,
+      data: data || new Date().toISOString().split('T')[0],
+      tipo,
+      descricao,
+      valor,
+      local,
+      autorizador: autorizador || 'Coord. Frotas'
+    });
+
+    persistir();
+    document.getElementById('manutDescricao').value = '';
+    document.getElementById('manutValor').value = '';
+    document.getElementById('manutLocal').value = '';
+    renderizarManutencoesAdm();
+    alert('Manutenção gravada com sucesso!');
+  }
+
+  function renderizarManutencoesAdm() {
+    const container = document.getElementById('historicoManutencoesAdm');
+    container.innerHTML = '';
+
+    let totalGasto = 0;
+    db.manutencoes.forEach(m => {
+      totalGasto += (m.valor || 0);
+      container.innerHTML += `
+        <div class="modern-card mb-2 p-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <b class="text-dark small">${m.veiculo}</b>
+            <span class="badge bg-danger rounded-pill">R$ ${m.valor.toFixed(2)}</span>
+          </div>
+          <div class="text-primary fw-bold small">${m.tipo} (${m.data})</div>
+          <div class="text-secondary small"><b>Reparo:</b> ${m.descricao}</div>
+          <div class="small text-muted"><b>Oficina:</b> ${m.local} | <b>Autorizou:</b> ${m.autorizador}</div>
+        </div>
+      `;
+    });
+
+    document.getElementById('totalGastoManutencaoAdm').innerText = `R$ ${totalGasto.toFixed(2)}`;
+  }
+
+  // SEÇÃO ADM 4: Relatórios
   function gerarRelatorioAdm() {
-    const tipo = document.getElementById('admRelTipo').value;
-    const motoristaFiltro = document.getElementById('admRelMotorista').value;
-    const area = document.getElementById('areaRelatorioAdmResultado');
-    const titulo = document.getElementById('relAdmTitulo');
-    const conteudo = document.getElementById('relAdmConteudo');
+    const tema = document.getElementById('admRelTemaSelect').value;
+    const area = document.getElementById('areaResultadoRelatorioAdm');
+    const titulo = document.getElementById('tituloRelatorioAdm');
+    const conteudo = document.getElementById('conteudoRelatorioAdm');
 
     area.classList.remove('d-none');
-    titulo.innerText = `RELATÓRIO: ${tipo.toUpperCase()}`;
-
     let html = '';
 
-    if (tipo === 'Combustivel' || tipo === 'Geral') {
-      html += `<h6 class="fw-bold text-primary mt-2">1. Despesas com Combustível & Abastecimento:</h6><ul class="list-group mb-2">`;
-      let totalR = 0;
-      let totalL = 0;
-      Object.keys(appData.historicoTurnos).forEach(k => {
-        const t = appData.historicoTurnos[k];
-        if (motoristaFiltro === 'TODOS' || t.motorista.includes(motoristaFiltro)) {
-          if (t.abastecimento && t.abastecimento.valor > 0) {
-            totalR += t.abastecimento.valor;
-            totalL += t.abastecimento.litros;
-            html += `<li class="list-group-item d-flex justify-content-between align-items-center small">${t.data} - ${t.motorista} (${t.veiculo}): ${t.abastecimento.litros}L de ${t.abastecimento.tipo} <b>R$ ${t.abastecimento.valor.toFixed(2)}</b></li>`;
-          }
-        }
+    if (tema === 'ConsolidadoGeral') {
+      titulo.innerText = "RESUMO GERAL CONSOLIDADO";
+      let totalGasto = db.manutencoes.reduce((acc, m) => acc + m.valor, 0);
+      html = `
+        <div class="p-2 bg-white rounded border">
+          • Total de Viagens no Sistema: <b>${db.viagens.length}</b><br>
+          • Total Gasto em Manutenções: <b>R$ ${totalGasto.toFixed(2)}</b><br>
+          • Veículos Ativos Monitorados: <b>4 unidades</b>
+        </div>
+      `;
+    } else if (tema === 'PresencaPacientes') {
+      titulo.innerText = "AUDITORIA DE EMBARQUE E GPS";
+      html = '<div class="list-group">';
+      db.viagens.forEach(v => {
+        let cor = v.presenca === 'Embarcado' ? 'text-success' : 'text-danger';
+        html += `
+          <div class="list-group-item p-2 small">
+            <b>${v.paciente}</b> <span class="${cor} fw-bold">[${v.presenca}]</span><br>
+            Condutor: ${v.motorista} | ${v.origem} ➔ ${v.destino}<br>
+            ${v.registroGps ? `<span class="text-muted">${v.registroGps}</span>` : ''}
+          </div>
+        `;
       });
-      html += `</ul><div class="alert alert-secondary py-1 small"><b>Total Combustível:</b> R$ ${totalR.toFixed(2)} (${totalL.toFixed(2)} Litros)</div>`;
-    }
-
-    if (tipo === 'Manutencao' || tipo === 'Geral') {
-      html += `<h6 class="fw-bold text-danger mt-3">2. Manutenção e Conservação da Frota:</h6><ul class="list-group mb-2">`;
-      let totalM = 0;
-      appData.historicoServicos.forEach(s => {
-        if (motoristaFiltro === 'TODOS' || s.motorista.includes(motoristaFiltro)) {
-          totalM += s.valor;
-          html += `<li class="list-group-item small">${s.data} - <b>${s.veiculo}</b>: ${s.tipo} (${s.descricao}) - Motorista: ${s.motorista} <b class="text-danger float-end">R$ ${s.valor.toFixed(2)}</b></li>`;
-        }
+      html += '</div>';
+    } else {
+      titulo.innerText = "HISTÓRICO DE MANUTENÇÕES E OFICINAS";
+      html = '<div class="list-group">';
+      db.manutencoes.forEach(m => {
+        html += `
+          <div class="list-group-item p-2 small">
+            <b>${m.veiculo}</b> - ${m.tipo} (R$ ${m.valor.toFixed(2)})<br>
+            Oficina: ${m.local} | Autorizado: ${m.autorizador}
+          </div>
+        `;
       });
-      html += `</ul><div class="alert alert-danger py-1 small"><b>Total Gasto em Manutenção:</b> R$ ${totalM.toFixed(2)}</div>`;
-    }
-
-    if (tipo === 'Pacientes' || tipo === 'Geral') {
-      html += `<h6 class="fw-bold text-success mt-3">3. Controle de Presença e Atendimento de Pacientes:</h6><ul class="list-group mb-2">`;
-      appData.todasRotas.forEach(r => {
-        if (motoristaFiltro === 'TODOS' || r.motorista.includes(motoristaFiltro)) {
-          let presColor = r.presenca === 'Compareceu' ? 'text-success' : (r.presenca === 'Ausente' ? 'text-danger' : 'text-muted');
-          html += `<li class="list-group-item small">${r.data} - <b>${r.paciente}</b> (${r.origem} ➔ ${r.destino}) | Motorista: ${r.motorista} | Presença: <b class="${presColor}">[${r.presenca}]</b></li>`;
-        }
-      });
-      html += `</ul>`;
+      html += '</div>';
     }
 
     conteudo.innerHTML = html;
   }
 
-  // OUTRAS FUNÇÕES DE ROTA, PONTO E DASHBOARD
-  function toggleAvariaInicio(switchEl) {
-    const box = document.getElementById('boxDetalhesAvariaInicio');
-    if (switchEl.checked) box.classList.remove('d-none');
-    else box.classList.add('d-none');
-  }
+  function baixarPdfRelatorioAdm() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-  function consultarDiarioPorData() {
-    const dataSel = document.getElementById('calendarioDataConsulta').value;
-    if (!dataSel) return;
-    appData.dataSelecionadaConsulta = dataSel;
-    atualizarRelatorioView();
-  }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("PREFEITURA MUNICIPAL DE GAMELEIRA DE GOIÁS", 20, 20);
+    doc.setFontSize(10);
+    doc.text("SECRETARIA MUNICIPAL DE SAÚDE - RELATÓRIO DE GESTÃO", 20, 26);
+    doc.line(20, 30, 190, 30);
 
-  function registrarDiaSemViagem() {
-    const dataSel = document.getElementById('calendarioDataConsulta').value || appData.dataHoje;
-    const motivo = document.getElementById('motivoSemViagem').value;
-    const motorista = appData.motoristaLogado || "Paulo Portilho";
-
-    const chave = `${motorista}_${dataSel}`;
-    appData.diasSemViagem[chave] = {
-      data: dataSel,
-      motorista: motorista,
-      motivo: motivo,
-      horaRegistro: new Date().toLocaleTimeString('pt-BR')
-    };
-
-    salvarEstado();
-    atualizarRelatorioView();
-    alert(`Dia sem viagem registrado para ${dataSel}!\nMotivo: ${motivo}`);
-  }
-
-  function adicionarCampoNovoPaciente() {
-    contadorPacientesForm++;
-    const container = document.getElementById('listaPacientesDinamicosContainer');
-    if (!container) return;
-
-    const divId = `itemPaciente_${contadorPacientesForm}`;
-    const cardHtml = `
-      <div class="card-paciente-item" id="${divId}">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="badge bg-primary fs-6">Paciente #${contadorPacientesForm}</span>
-          ${contadorPacientesForm > 1 ? `<button class="btn btn-sm btn-outline-danger py-0 px-2" type="button" onclick="removerCampoPaciente('${divId}')"><i class="bi bi-trash"></i> Remover</button>` : ''}
-        </div>
-
-        <div class="row g-2 mb-2">
-          <div class="col-7">
-            <label class="form-label small text-muted fw-bold">Nome do Paciente:</label>
-            <input type="text" class="form-control input-pac-nome" placeholder="Ex: Maria dos Santos">
-          </div>
-          <div class="col-5">
-            <label class="form-label small text-muted fw-bold">Telefone / Whats:</label>
-            <input type="text" class="form-control input-pac-fone" placeholder="62999990000">
-          </div>
-        </div>
-
-        <div class="row g-2 mb-2">
-          <div class="col-4">
-            <label class="form-label small text-muted fw-bold">Horário:</label>
-            <input type="time" class="form-control input-pac-hora">
-          </div>
-          <div class="col-8">
-            <label class="form-label small text-muted fw-bold">Origem (Embarque):</label>
-            <input type="text" class="form-control input-pac-origem" placeholder="UBS / Residência">
-          </div>
-        </div>
-
-        <div class="mb-2">
-          <label class="form-label small text-muted fw-bold">Destino (Hospital / Clínica):</label>
-          <input type="text" class="form-control input-pac-destino" placeholder="Ex: Hospital das Clínicas, Goiânia">
-        </div>
-
-        <div>
-          <label class="form-label small text-muted fw-bold">Observações / Requisitos:</label>
-          <input type="text" class="form-control input-pac-obs" placeholder="Ex: Cadeirante, Jejum, Acompanhante...">
-        </div>
-      </div>
-    `;
-
-    container.insertAdjacentHTML('beforeend', cardHtml);
-  }
-
-  function removerCampoPaciente(elementId) {
-    const el = document.getElementById(elementId);
-    if (el) el.remove();
-  }
-
-  function salvarTodaEscalaAdm() {
-    const dataV = document.getElementById('admCadData').value;
-    const motorista = document.getElementById('admCadMotorista').value;
-    const veiculo = document.getElementById('admCadVeiculo').value;
-
-    const cardsPacientes = document.querySelectorAll('.card-paciente-item');
-    if (cardsPacientes.length === 0) {
-      alert('Adicione pelo menos um paciente na escala!');
-      return;
-    }
-
-    let adicionadosCount = 0;
-    cardsPacientes.forEach((card) => {
-      const nome = card.querySelector('.input-pac-nome').value.trim();
-      const fone = card.querySelector('.input-pac-fone').value.trim() || '62999990000';
-      const hora = card.querySelector('.input-pac-hora').value || '07:00';
-      const origem = card.querySelector('.input-pac-origem').value.trim() || 'UBS Central';
-      const destino = card.querySelector('.input-pac-destino').value.trim() || 'Goiânia';
-      const obs = card.querySelector('.input-pac-obs').value.trim() || 'Sem observações';
-
-      if (nome) {
-        appData.todasRotas.push({
-          id: "ROTA-" + String(appData.todasRotas.length + 1).padStart(3, '0'),
-          data: dataV || appData.dataHoje,
-          motorista,
-          veiculo,
-          paciente: nome,
-          fone,
-          origem,
-          destino,
-          horario: hora,
-          obs,
-          presenca: "Aguardando",
-          presencaInfo: null,
-          status: "Pendente"
-        });
-        adicionadosCount++;
+    const linhas = document.getElementById('conteudoRelatorioAdm').innerText.split('\n');
+    let y = 40;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    linhas.forEach(l => {
+      if (l.trim()) {
+        doc.text(l.trim(), 20, y);
+        y += 6;
+        if (y > 280) { doc.addPage(); y = 20; }
       }
     });
 
-    salvarEstado();
-    document.getElementById('listaPacientesDinamicosContainer').innerHTML = '';
-    contadorPacientesForm = 0;
-    adicionarCampoNovoPaciente();
-    alert(`Sucesso! ${adicionadosCount} paciente(s) adicionado(s) à escala!`);
+    doc.save(`Relatorio_Gestao_${new Date().toISOString().split('T')[0]}.pdf`);
   }
 
-  function verificarOpcaoPerfil(selectEl) {
-    const box = document.getElementById('boxMotoristaEventual');
-    if (selectEl.value === '__NOVO__') box.classList.remove('d-none');
-    else box.classList.add('d-none');
-  }
-
-  function realizarLogin() {
-    const select = document.getElementById('loginMotoristaSelect');
-    let perfil = select.value;
-    document.getElementById('loginScreen').classList.add('d-none');
-
-    if (perfil === 'ADM') {
-      appData.perfilAtual = 'ADM';
-      document.getElementById('admApp').classList.remove('d-none');
-      atualizarPainelAdm();
-    } else {
-      if (perfil === '__NOVO__') {
-        const nomeEv = document.getElementById('eventualNome').value.trim();
-        const cpfEv = document.getElementById('eventualCpf').value.trim();
-        perfil = `${nomeEv} (CPF: ${cpfEv})`;
-      }
-
-      appData.perfilAtual = 'MOTORISTA';
-      appData.motoristaLogado = perfil;
-      document.getElementById('userDisplay').innerText = `Motorista: ${perfil}`;
-      document.getElementById('repMotorista').innerText = perfil;
-      document.getElementById('motoristaApp').classList.remove('d-none');
-
-      carregarRotasDoMotorista();
-      atualizarDashboard();
-    }
-  }
-
-  function realizarLogout() {
-    if (confirm('Deseja realmente sair?')) {
-      appData.motoristaLogado = null;
-      appData.perfilAtual = null;
-      document.getElementById('admApp').classList.add('d-none');
-      document.getElementById('motoristaApp').classList.add('d-none');
-      document.getElementById('loginScreen').classList.remove('d-none');
-    }
-  }
-
-  function showAdmTab(tabName, btn) {
-    document.querySelectorAll('.adm-section').forEach(el => el.classList.add('d-none'));
-    document.querySelectorAll('#admApp .nav-bottom button').forEach(el => el.classList.remove('active'));
-    document.getElementById('adm-sec-' + tabName).classList.remove('d-none');
-    if (btn) btn.classList.add('active');
-    if (tabName === 'rotasgerais') atualizarListaRotasAdm();
-    if (tabName === 'manutencao') atualizarTotaisManutencaoAdm();
-  }
-
-  function atualizarPainelAdm() {
-    document.getElementById('admTotalViagensBadge').innerText = appData.todasRotas.length;
-    atualizarListaRotasAdm();
-    atualizarTotaisManutencaoAdm();
-  }
-
-  function atualizarListaRotasAdm() {
-    const container = document.getElementById('admListaRotasContainer');
-    if (!container) return;
-    container.innerHTML = '';
-
-    appData.todasRotas.forEach(r => {
-      let badge = r.status === 'Concluído' ? 'bg-success' : (r.status === 'Em Trânsito' ? 'bg-warning text-dark' : 'bg-primary');
-      let presencaBadge = r.presenca === 'Compareceu' ? 'badge bg-success' : (r.presenca === 'Ausente' ? 'badge bg-danger' : 'badge bg-secondary');
-      
-      container.innerHTML += `
-        <div class="card card-custom p-3 border-start border-4 ${r.status === 'Concluído' ? 'border-success' : 'border-primary'}">
-          <div class="d-flex justify-content-between">
-            <h6 class="fw-bold m-0">${r.paciente}</h6>
-            <div>
-              <span class="${presencaBadge} me-1">${r.presenca}</span>
-              <span class="badge ${badge}">${r.status}</span>
-            </div>
-          </div>
-          <div class="small text-primary fw-bold mt-1">
-            <span>📅 ${r.data}</span> | <span>🕒 ${r.horario}</span> | <span>👤 Motorista: ${r.motorista}</span>
-          </div>
-          <div class="small text-muted mt-1">
-            <div><b>Veículo:</b> ${r.veiculo}</div>
-            <div><b>Origem:</b> ${r.origem} ➔ <b>Destino:</b> ${r.destino}</div>
-          </div>
-        </div>`;
+  function baixarPlanilhaCSV() {
+    let csv = "\uFEFFID;Data;Motorista;Veiculo;Paciente;Horario;Origem;Destino;Presenca;Auditoria\n";
+    db.viagens.forEach(v => {
+      csv += `${v.id};${v.data};${v.motorista};${v.veiculo};"${v.paciente}";${v.horario};"${v.origem}";"${v.destino}";${v.presenca};"${v.registroGps || ''}"\n`;
     });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Prestacao_Contas_Gameleira_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
   }
 
-  function obterMinhasRotasPorData(dataFiltro) {
-    if (!appData.motoristaLogado) return [];
-    return appData.todasRotas
-      .filter(r => (r.data === dataFiltro) && (r.motorista.toLowerCase().includes(appData.motoristaLogado.toLowerCase()) || appData.motoristaLogado.includes(r.motorista)))
-      .sort((a, b) => a.horario.localeCompare(b.horario));
-  }
-
-  function carregarRotasDoMotorista() {
-    const container = document.getElementById('rotasContainer');
-    if (!container) return;
-    container.innerHTML = '';
-    
-    const minhasViagensHoje = obterMinhasRotasPorData(appData.dataHoje);
-    document.getElementById('totalViagensCount').innerText = minhasViagensHoje.length;
-
-    if (minhasViagensHoje.length === 0) {
-      container.innerHTML = `<div class="card card-custom p-4 text-center text-muted"><h6>Nenhuma viagem para hoje (${appData.dataHoje}).</h6></div>`;
-      return;
-    }
-
-    minhasViagensHoje.forEach((r, idx) => {
-      let badgeClass = r.status === 'Concluído' ? 'bg-success' : (r.status === 'Em Trânsito' ? 'bg-warning text-dark' : 'bg-primary');
-      let presencaBadge = r.presenca === 'Compareceu' ? '<span class="badge bg-success ms-1">Embarcou</span>' : (r.presenca === 'Ausente' ? '<span class="badge bg-danger ms-1">Ausente</span>' : '<span class="badge bg-secondary ms-1">Aguardando</span>');
-
-      container.innerHTML += `
-        <div class="card card-custom p-3 border-start border-4 ${r.status === 'Concluído' ? 'border-success' : 'border-primary'}">
-          <div class="d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold m-0"><span class="badge bg-dark me-1">#${idx+1}</span> ${r.paciente}</h6>
-            <div>${presencaBadge} <span class="badge ${badgeClass}">${r.status}</span></div>
-          </div>
-          
-          <div class="small mt-1 text-primary fw-bold">🕒 Consulta: ${r.horario} | 🚐 ${r.veiculo}</div>
-          <div class="small mt-1 text-muted"><b>Origem:</b> ${r.origem} ➔ <b>Destino:</b> ${r.destino}</div>
-
-          <div class="p-2 bg-light rounded mt-2 border">
-            <div class="row g-1">
-              <div class="col-6">
-                <button class="btn btn-sm ${r.presenca === 'Compareceu' ? 'btn-success' : 'btn-outline-success'} w-100 fw-bold" onclick="marcarPresencaComGeo('${r.id}', 'Compareceu')">
-                  <i class="bi bi-check-circle"></i> Compareceu
-                </button>
-              </div>
-              <div class="col-6">
-                <button class="btn btn-sm ${r.presenca === 'Ausente' ? 'btn-danger' : 'btn-outline-danger'} w-100 fw-bold" onclick="marcarPresencaComGeo('${r.id}', 'Ausente')">
-                  <i class="bi bi-x-circle"></i> Não está no local
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="d-flex gap-2 mt-2">
-            <button class="btn btn-sm btn-outline-success flex-fill fw-bold" onclick="enviarAlertaWhatsAppPaciente('${r.paciente}', '${r.fone}', '${r.origem}', '${r.veiculo}')">
-              <i class="bi bi-whatsapp"></i> Avisar
-            </button>
-            <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(r.destino)}" target="_blank" class="btn btn-sm btn-outline-secondary flex-fill">
-              <i class="bi bi-geo-alt-fill"></i> GPS
-            </a>
-            <button class="btn btn-sm btn-dark" onclick="concluirViagemMotorista('${r.id}')">Concluir</button>
-          </div>
-        </div>`;
-    });
-  }
-
-  function iniciarViagemGeralENotificarTodos() {
-    const viagens = obterMinhasRotasPorData(appData.dataHoje);
-    if (viagens.length === 0) return;
-
-    viagens.forEach(r => { r.status = 'Em Trânsito'; });
-    salvarEstado();
-    carregarRotasDoMotorista();
-    enviarAlertaWhatsAppPaciente(viagens[0].paciente, viagens[0].fone, viagens[0].origem, appData.veiculoAtivo);
-  }
-
-  async function marcarPresencaComGeo(rotaId, statusPresenca) {
-    const r = appData.todasRotas.find(item => item.id === rotaId);
-    if (!r) return;
-
-    const hora = new Date().toLocaleTimeString('pt-BR');
-    r.presenca = statusPresenca;
-    r.presencaInfo = `${statusPresenca === 'Compareceu' ? 'Embarcado' : 'Ausente'} às ${hora}`;
-    salvarEstado();
-    carregarRotasDoMotorista();
-    alert(`Presença atualizada: ${r.paciente} marcado como ${statusPresenca}!`);
-  }
-
-  function concluirViagemMotorista(rotaId) {
-    const r = appData.todasRotas.find(item => item.id === rotaId);
-    if (!r) return;
-    r.status = 'Concluído';
-    salvarEstado();
-    carregarRotasDoMotorista();
-    alert(`Viagem de ${r.paciente} finalizada!`);
-  }
-
-  function enviarAlertaWhatsAppPaciente(nomePaciente, fone, enderecoOrigem, veiculo) {
-    const numLimpo = fone.replace(/\D/g, '');
-    const motorista = appData.motoristaLogado || "Motorista da Saúde";
-    const msg = `Olá, *${nomePaciente}*! Aqui é o motorista *${motorista}* do Transporte da Saúde Municipal.\n\nInformamos que nosso veículo (*${veiculo}*) já *INICIOU O DESLOCAMENTO* e está a caminho do seu local de embarque (*${enderecoOrigem}*).\n\nPor favor, fique atento(a) para o embarque! 🚑`;
-    window.open(`https://api.whatsapp.com/send?phone=55${numLimpo}&text=${encodeURIComponent(msg)}`, '_blank');
-  }
-
-  function abrirRotaCompletaMaps() {
-    const viagens = obterMinhasRotasPorData(appData.dataHoje);
-    if (viagens.length === 0) return;
-    const paradas = viagens.map(v => encodeURIComponent(v.destino));
-    const destinoFinal = paradas.pop();
-    const waypoints = paradas.join('|');
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${destinoFinal}&waypoints=${waypoints}`, '_blank');
-  }
-
-  function atualizarVeiculoAtivo() {
-    const selV = document.getElementById('selectVeiculo');
-    if (selV) {
-      appData.veiculoAtivo = selV.value;
-      const b = document.getElementById('dashVeiculoBadge');
-      if (b) b.innerText = appData.veiculoAtivo;
-      atualizarDashboard();
-      salvarEstado();
-    }
-  }
-
-  function showTab(tabName, btn) {
-    document.querySelectorAll('#motoristaApp .app-section').forEach(el => el.classList.add('d-none'));
-    document.querySelectorAll('#motoristaApp .nav-bottom button').forEach(el => el.classList.remove('active'));
-    const target = document.getElementById('sec-' + tabName);
-    if (target) target.classList.remove('d-none');
-    if (btn) btn.classList.add('active');
-    if (tabName === 'relatorio') consultarDiarioPorData();
-  }
-
-  function setQuickAlarm() {
-    const time = document.getElementById('alarmTime').value;
-    if (!time) return;
-    document.getElementById('alarmFeedback').innerText = 'Alarme ativo para ' + time;
-  }
-
-  function registrarEntrada() {
-    const chave = document.getElementById('checkChaveEntrada').checked;
-    const km = parseFloat(document.getElementById('kmInicialInput').value);
-    const temAvaria = document.getElementById('checkTemAvariaInicio').checked;
-
-    if (!chave || !km) { alert('Confirme a chave e informe o Km inicial.'); return; }
-    
-    if (temAvaria) {
-      const tipoAv = document.getElementById('avariaInicioTipo').value;
-      const descAv = document.getElementById('avariaInicioDescricao').value.trim();
-      appData.avariaVistoriaInicial = `Avaria: [${tipoAv}] ${descAv}`;
-    } else {
-      appData.avariaVistoriaInicial = "Veículo íntegro / Sem avarias prévias";
-    }
-
-    appData.entrada = new Date().toLocaleTimeString('pt-BR');
-    appData.chaveEntrada = true;
-    appData.kmInicial = km;
-    document.getElementById('entradaTimestamp').innerText = 'Entrada: ' + appData.entrada;
-    document.getElementById('btnRegistrarEntrada').disabled = true;
-    document.getElementById('btnRegistrarSaida').disabled = false;
-    document.getElementById('statusBadge').innerText = "Em Turno Ativo";
-    salvarEstado();
-    alert('Ponto registrado e vistoria gravada!');
-  }
-
-  function calcularKmTotal() {
-    const kmF = parseFloat(document.getElementById('kmFinalInput').value) || 0;
-    const kmI = appData.kmInicial || 0;
-    if (kmF >= kmI) {
-      document.getElementById('boxCalculoKm').innerText = 'Total rodado: ' + (kmF - kmI) + ' Km';
-    }
-  }
-
-  function registrarSaida() {
-    const chave = document.getElementById('checkChaveSaida').checked;
-    const km = parseFloat(document.getElementById('kmFinalInput').value);
-    const valorReais = parseFloat(document.getElementById('abasteceReais').value) || 0;
-    const litros = parseFloat(document.getElementById('abasteceLitros').value) || 0;
-    const tipoComb = document.getElementById('abasteceTipo').value;
-
-    if (!chave || !km || km < appData.kmInicial) { alert('Verifique a devolução da chave e o Km final.'); return; }
-
-    appData.abastecimento = { valor: valorReais, litros: litros, tipo: tipoComb };
-    appData.saida = new Date().toLocaleTimeString('pt-BR');
-    appData.chaveSaida = true;
-    appData.kmFinal = km;
-    
-    const chaveHist = `${appData.motoristaLogado}_${appData.dataHoje}`;
-    appData.historicoTurnos[chaveHist] = {
-      data: appData.dataHoje,
-      motorista: appData.motoristaLogado,
-      veiculo: appData.veiculoAtivo,
-      entrada: appData.entrada,
-      saida: appData.saida,
-      kmInicial: appData.kmInicial,
-      kmFinal: appData.kmFinal,
-      kmTotal: (appData.kmFinal - appData.kmInicial),
-      avariaVistoria: appData.avariaVistoriaInicial,
-      abastecimento: appData.abastecimento
-    };
-
-    document.getElementById('saidaTimestamp').innerText = 'Encerrado às: ' + appData.saida;
-    document.getElementById('btnRegistrarSaida').disabled = true;
-    document.getElementById('statusBadge').innerText = "Turno Concluído";
-    salvarEstado();
-    alert('Turno finalizado com sucesso!');
-  }
-
-  async function obterBairroECidade(lat, lng) {
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-      const data = await res.json();
-      return `${data.address.suburb || 'Centro'}, ${data.address.city || 'Goiânia'} - ${data.address.state_code || 'GO'}`;
-    } catch (e) {
-      return `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
-    }
-  }
-
-  function processarFotoEndereco(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const local = await obterBairroECidade(pos.coords.latitude, pos.coords.longitude);
-        desenharFotoComEndereco(file, local);
-      });
-    }
-  }
-
-  function desenharFotoComEndereco(file, localTexto) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        const canvas = document.getElementById('photoCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-
-        ctx.fillStyle = "rgba(0, 0, 0, 0.70)";
-        ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 20px Arial";
-        ctx.fillText(`TRANSPORTE SAÚDE | ${localTexto.toUpperCase()} | ${new Date().toLocaleTimeString('pt-BR')}`, 20, canvas.height - 24);
-
-        canvas.style.display = 'block';
-        document.getElementById('geoInfoBox').classList.remove('d-none');
-        document.getElementById('geoInfoBox').innerHTML = `<b>Local:</b> ${localTexto}`;
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function salvarRegistroCampo() {
-    alert('Registro com localização gravado!');
-  }
-
-  function escanearDocumentoProcess(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        const canvas = document.getElementById('docCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        canvas.style.display = 'block';
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function salvarDocumentoEscaneado() {
-    alert('Documento digitalizado com sucesso!');
-  }
-
-  function enviarAlertaEmailManutencao() {
-    window.location.href = `mailto:frotasaude@municipio.gov.br?subject=Alerta Frota&body=Verificação preventiva de quilometragem.`;
-  }
-
-  function atualizarDashboard() {
-    const kmTot = (appData.kmFinal >= appData.kmInicial && appData.kmInicial > 0) ? (appData.kmFinal - appData.kmInicial) : 0;
-    const kmTotEl = document.getElementById('kmTotalDisplay');
-    if (kmTotEl) kmTotEl.innerText = kmTot + ' Km';
-    
-    const veiculo = appData.veiculoAtivo || "Van (Placa: ABC-1234)";
-    const meta = appData.manutencaoMetas[veiculo] || { oleoKmAlvo: 48000, revisaoKmAlvo: 50000, ultimoServico: "Nenhum histórico recente" };
-    const kmAtual = appData.kmFinal || appData.kmInicial || 40000;
-    
-    document.getElementById('dashOleoKm').innerText = `Meta: ${meta.oleoKmAlvo} Km`;
-    document.getElementById('dashRevisaoKm').innerText = `Meta: ${meta.revisaoKmAlvo} Km`;
-    document.getElementById('dashUltimaManutencaoTxt').innerText = meta.ultimoServico;
-  }
-
-  function atualizarRelatorioView() {
-    const dataConsulta = appData.dataSelecionadaConsulta || appData.dataHoje;
-    const motorista = appData.motoristaLogado || "Paulo Portilho";
-
-    document.getElementById('repDataVisualizada').innerText = dataConsulta;
-    document.getElementById('repData').innerText = dataConsulta;
-    document.getElementById('repMotorista').innerText = motorista;
-
-    const infoTurno = appData.historicoTurnos[`${motorista}_${dataConsulta}`];
-    const viagensData = obterMinhasRotasPorData(dataConsulta);
-
-    if (infoTurno) {
-      document.getElementById('repVeiculo').innerText = infoTurno.veiculo;
-      document.getElementById('repAvariaVistoria').innerHTML = `<span class="text-success fw-bold">${infoTurno.avariaVistoria || 'Veículo Íntegro'}</span>`;
-      document.getElementById('repEntrada').innerText = `${infoTurno.entrada} (Chave: Sim)`;
-      document.getElementById('repSaida').innerText = `${infoTurno.saida} (Chave: Sim)`;
-      document.getElementById('repKm').innerHTML = `Inicial: <b>${infoTurno.kmInicial}</b> | Final: <b>${infoTurno.kmFinal}</b> | <b class="text-success">Total: ${infoTurno.kmTotal} Km</b>`;
-      document.getElementById('repAbastecimento').innerHTML = infoTurno.abastecimento && infoTurno.abastecimento.valor > 0 ? `<b>R$ ${infoTurno.abastecimento.valor.toFixed(2)}</b> (${infoTurno.abastecimento.litros} L)` : 'Não abastecido';
-    } else {
-      document.getElementById('repVeiculo').innerText = appData.veiculoAtivo;
-      document.getElementById('repAvariaVistoria').innerHTML = `<span class="text-success fw-bold">${appData.avariaVistoriaInicial}</span>`;
-      document.getElementById('repEntrada').innerText = appData.entrada || 'Pendente';
-      document.getElementById('repSaida').innerText = appData.saida || 'Pendente';
-      document.getElementById('repKm').innerHTML = `Total: 0 Km`;
-      document.getElementById('repAbastecimento').innerText = 'Pendente';
-    }
-
-    const viagBox = document.getElementById('repViagensLista');
-    if (viagBox) {
-      viagBox.innerHTML = '';
-      viagensData.forEach(r => {
-        viagBox.innerHTML += `<div class="mb-1">• <b>${r.paciente}</b> (${r.origem} ➔ ${r.destino}) - Presença: [${r.presenca}]</div>`;
-      });
-    }
-  }
-
-  function salvarEstado() {
-    localStorage.setItem('transporte_saude_db_master_v9', JSON.stringify(appData));
-  }
-
-  function sincronizarComPlanilha() {
-    alert('Sincronização ativada: Todos os dados foram gravados na planilha central!');
-  }
+  // Relógio do mockup
+  setInterval(() => {
+    const d = new Date();
+    document.getElementById('relogioTopo').innerText = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }, 1000);
 </script>
 </body>
 </html>
