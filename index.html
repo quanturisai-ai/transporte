@@ -514,6 +514,19 @@
         </button>
       </div>
 
+      <div class="row g-2 mb-2">
+        <div class="col-6">
+          <button class="btn btn-sm btn-brand-lime w-100 rounded-pill fw-bold" style="padding: 8px;" onclick="iniciarRotaGeral()">
+            <i class="bi bi-rocket-takeoff-fill"></i> Iniciar Rota
+          </button>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-sm btn-outline-dark w-100 rounded-pill fw-bold" style="padding: 8px;" onclick="abrirRotaCompletaMaps()">
+            <i class="bi bi-map-fill"></i> Ver no Maps
+          </button>
+        </div>
+      </div>
+
       <div id="containerListaEmbarque"></div>
     </div>
 
@@ -864,6 +877,7 @@
         origem: "Gameleira de Goiás",
         destino: "Hospital das Clínicas, Goiânia",
         presenca: "Embarcado",
+        emTransito: true,
         registroGps: "Confirmado às 07:32 (Gameleira de Goiás)"
       },
       {
@@ -877,6 +891,7 @@
         origem: "Gameleira de Goiás",
         destino: "Policlínica Estadual, Goiânia",
         presenca: "Aguardando",
+        emTransito: false,
         registroGps: null
       }
     ],
@@ -1003,12 +1018,14 @@
 
     minhasViagens.forEach((r, idx) => {
       let corBadge = r.presenca === 'Embarcado' ? 'bg-success' : (r.presenca === 'Não Embarcou' ? 'bg-danger' : 'bg-warning text-dark');
+      let textoBadge = r.presenca === 'Aguardando' && r.emTransito ? 'Em Trânsito' : r.presenca;
+      if (r.presenca === 'Aguardando' && r.emTransito) corBadge = 'bg-info text-dark';
 
       container.innerHTML += `
         <div class="card-embarque-motorista">
           <div class="d-flex justify-content-between align-items-center mb-1">
             <b>#${idx+1} ${r.paciente}</b>
-            <span class="badge ${corBadge} rounded-pill">${r.presenca}</span>
+            <span class="badge ${corBadge} rounded-pill">${textoBadge}</span>
           </div>
           <div class="small text-muted mb-2">
             🕒 ${r.horario} | 🚐 ${r.veiculo}<br>
@@ -1026,10 +1043,61 @@
               </button>
             </div>
           </div>
+          <button class="btn btn-sm btn-outline-success w-100 rounded-pill fw-bold mt-2" onclick="notificarPacienteWhatsApp('${r.id}')">
+            <i class="bi bi-whatsapp"></i> Avisar Paciente no WhatsApp
+          </button>
           ${r.registroGps ? `<small class="d-block text-primary mt-2" style="font-size: 10.5px;"><i class="bi bi-geo-alt"></i> ${r.registroGps}</small>` : ''}
         </div>
       `;
     });
+  }
+
+  function enviarAlertaWhatsAppPaciente(nomePaciente, fone, enderecoOrigem, veiculo) {
+    const numLimpo = (fone || '').replace(/\D/g, '');
+    const motorista = db.usuarioAtivo || 'Motorista da Saúde';
+    const msg = `Olá, *${nomePaciente}*! Aqui é o motorista *${motorista}* do Transporte Sanitário Municipal.\n\nInformamos que nosso veículo (*${veiculo}*) já *INICIOU O DESLOCAMENTO* e está a caminho do seu local de embarque (*${enderecoOrigem}*).\n\nPor favor, fique atento(a) para o embarque! 🚑`;
+    window.open(`https://api.whatsapp.com/send?phone=55${numLimpo}&text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  function notificarPacienteWhatsApp(id) {
+    const r = db.viagens.find(v => v.id === id);
+    if (!r) return;
+    enviarAlertaWhatsAppPaciente(r.paciente, r.fone, r.origem, r.veiculo);
+  }
+
+  function iniciarRotaGeral() {
+    const minhasViagens = db.viagens.filter(v => v.motorista === db.usuarioAtivo);
+    if (minhasViagens.length === 0) {
+      alert('Nenhum passageiro na sua rota hoje.');
+      return;
+    }
+
+    minhasViagens.forEach(v => { v.emTransito = true; });
+    persistir();
+    renderizarViagensMotorista();
+
+    const primeiro = minhasViagens[0];
+    enviarAlertaWhatsAppPaciente(primeiro.paciente, primeiro.fone, primeiro.origem, primeiro.veiculo);
+  }
+
+  function abrirRotaCompletaMaps() {
+    const minhasViagens = db.viagens.filter(v => v.motorista === db.usuarioAtivo);
+    if (minhasViagens.length === 0) {
+      alert('Nenhum passageiro na sua rota hoje.');
+      return;
+    }
+
+    const paradas = minhasViagens
+      .slice()
+      .sort((a, b) => a.horario.localeCompare(b.horario))
+      .map(v => encodeURIComponent(v.destino));
+
+    const destinoFinal = paradas.pop();
+    const waypoints = paradas.join('|');
+    const url = waypoints
+      ? `https://www.google.com/maps/dir/?api=1&destination=${destinoFinal}&waypoints=${waypoints}`
+      : `https://www.google.com/maps/dir/?api=1&destination=${destinoFinal}`;
+    window.open(url, '_blank');
   }
 
   function marcarPresencaMotorista(id, status) {
@@ -1237,6 +1305,7 @@
           origem,
           destino,
           presenca: "Aguardando",
+          emTransito: false,
           registroGps: null
         });
         gravados++;
