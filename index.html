@@ -547,6 +547,28 @@
           <label class="form-label small text-muted fw-bold">Km Inicial no Painel:</label>
           <input type="number" id="inputKmInicial" class="form-control" placeholder="Ex: 45200" oninput="recalcularMetricasMotorista()">
         </div>
+
+        <div class="mb-2 p-2 rounded" style="background: #fff5f5; border: 1px solid #ffd9d9;">
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" id="checkTemAvaria" onchange="toggleAvariaInicio()">
+            <label class="form-check-label fw-bold text-danger small" for="checkTemAvaria">
+              <i class="bi bi-shield-slash"></i> O veículo possui avaria prévia?
+            </label>
+          </div>
+          <div id="boxDetalhesAvaria" class="d-none mt-2">
+            <select id="avariaTipoSelect" class="form-select form-select-sm mb-2">
+              <option>Arranhão / Amassado na Lataria</option>
+              <option>Parachoque Trincado / Desencaixado</option>
+              <option>Farol / Lanterna Quebrada</option>
+              <option>Pneu Danificado / Roda Ralada</option>
+              <option>Vidro / Retrovisor Trincado</option>
+              <option>Estofamento / Interior Danificado</option>
+            </select>
+            <textarea id="avariaDescricaoInput" class="form-control form-control-sm mb-2" rows="2" placeholder="Descreva a avaria encontrada..."></textarea>
+            <input type="file" id="avariaFotoInput" accept="image/*" capture="environment" class="form-control form-control-sm">
+          </div>
+        </div>
+
         <button class="btn-brand-dark" onclick="registrarPontoEntradaMotorista()">
           <i class="bi bi-clock"></i> Registrar Ponto de Entrada
         </button>
@@ -564,6 +586,14 @@
             <label class="form-label small text-muted fw-bold">Litros:</label>
             <input type="number" id="inputLitrosAbastece" class="form-control" placeholder="0.00 L" oninput="recalcularMetricasMotorista()">
           </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Combustível:</label>
+          <select id="selectTipoCombustivel" class="form-select" onchange="recalcularMetricasMotorista()">
+            <option value="Diesel S10">Diesel S10</option>
+            <option value="Gasolina Comum">Gasolina Comum</option>
+            <option value="Etanol">Etanol</option>
+          </select>
         </div>
         <button class="btn btn-sm btn-outline-secondary w-100 rounded-pill" onclick="simularCupomMotorista()">
           <i class="bi bi-magic"></i> Simular OCR Cupom Fiscal
@@ -598,8 +628,96 @@
       </div>
     </div>
 
+    <!-- SUB-ABA MOTORISTA: MANUTENÇÃO -->
+    <div id="aba-manutencao-mot" class="sub-secao-motorista d-none">
+      <div class="modern-card">
+        <h6 class="fw-bold mb-2"><i class="bi bi-tools text-warning"></i> Registrar Manutenção</h6>
+        <p class="text-muted small mb-2">Lance aqui serviços feitos no veículo durante a rota.</p>
+
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Data:</label>
+            <input type="date" id="motManutData" class="form-control">
+          </div>
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Km Atual:</label>
+            <input type="number" id="motManutKm" class="form-control" placeholder="Ex: 45300">
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">Tipo de Serviço:</label>
+          <select id="motManutTipo" class="form-select">
+            <option value="Troca de Óleo e Filtros">Troca de Óleo e Filtros</option>
+            <option value="Sistema de Freios">Freios (Pastilhas/Discos)</option>
+            <option value="Pneus e Alinhamento">Pneus e Alinhamento</option>
+            <option value="Revisão Periódica">Revisão Periódica</option>
+            <option value="Suspensão">Suspensão</option>
+            <option value="Outros Reparos">Outros Reparos</option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label small text-muted fw-bold">O que foi feito:</label>
+          <textarea id="motManutDescricao" class="form-control" rows="2" placeholder="Ex: Troca de 6L óleo 5W30 sintético e filtro..."></textarea>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Valor (R$):</label>
+            <input type="number" id="motManutValor" class="form-control" placeholder="0,00">
+          </div>
+          <div class="col-6">
+            <label class="form-label small text-muted fw-bold">Oficina:</label>
+            <input type="text" id="motManutLocal" class="form-control" placeholder="Nome da Auto Center">
+          </div>
+        </div>
+
+        <button class="btn-brand-lime" onclick="salvarManutencaoMotorista()">
+          <i class="bi bi-save"></i> Gravar Manutenção
+        </button>
+      </div>
+    </div>
+
     <!-- SUB-ABA MOTORISTA: BOLETIM / PDF -->
     <div id="aba-relatorio-mot" class="sub-secao-motorista d-none">
+      <div class="modern-card mb-3">
+        <h6 class="fw-bold mb-2"><i class="bi bi-calendar3 text-primary"></i> Diário de Bordo por Data</h6>
+        <div class="row g-2 mb-2">
+          <div class="col-8">
+            <input type="date" id="inputDataConsultaDiario" class="form-control">
+          </div>
+          <div class="col-4">
+            <button class="btn btn-outline-dark w-100 h-100 fw-bold rounded-pill" onclick="consultarDiarioPorData()">
+              <i class="bi bi-search"></i> Ver
+            </button>
+          </div>
+        </div>
+        <div class="p-2 bg-light rounded border">
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="fw-bold text-dark"><i class="bi bi-slash-circle"></i> Não rodou nesta data?</small>
+            <button class="btn btn-sm btn-outline-secondary py-0 rounded-pill" type="button" onclick="document.getElementById('boxDiaSemViagem').classList.toggle('d-none')">
+              Justificar
+            </button>
+          </div>
+          <div class="d-none mt-2" id="boxDiaSemViagem">
+            <select id="selectMotivoSemViagem" class="form-select form-select-sm mb-2">
+              <option value="Plantão na Base / Serviços Administrativos">Plantão na Base / Serviços Administrativos</option>
+              <option value="Veículo em Manutenção / Oficina">Veículo em Manutenção / Oficina</option>
+              <option value="Escala Livre / Sem Pacientes Agendados">Escala Livre / Sem Pacientes Agendados</option>
+              <option value="Folga Regulamentar">Folga Regulamentar</option>
+              <option value="Atestado / Licença Médica">Atestado / Licença Médica</option>
+            </select>
+            <button class="btn btn-sm btn-secondary w-100 rounded-pill fw-bold" onclick="registrarDiaSemViagem()">
+              <i class="bi bi-save"></i> Gravar Dia Sem Viagem
+            </button>
+          </div>
+        </div>
+        <div class="alert alert-info py-2 small mt-2 mb-0" id="bannerDiarioData">
+          Exibindo boletim do turno atual.
+        </div>
+      </div>
+
       <div class="modern-card">
         <div class="text-center border-bottom pb-2 mb-2">
           <h6 class="fw-bold m-0">PREFEITURA DE GAMELEIRA DE GOIÁS</h6>
@@ -613,6 +731,8 @@
             <tr><th>Jornada:</th><td id="repJornadaHoras">--</td></tr>
             <tr><th>Quilometragem:</th><td id="repKmTotal">0 Km</td></tr>
             <tr><th>Autonomia:</th><td id="repMediaAutonomia">-- Km/L</td></tr>
+            <tr><th>Combustível:</th><td id="repTipoCombustivel">--</td></tr>
+            <tr><th>Vistoria / Avaria:</th><td id="repAvariaVistoria">Veículo íntegro / Sem avarias prévias</td></tr>
           </tbody>
         </table>
 
@@ -632,6 +752,7 @@
       <button class="pill-nav-btn active" onclick="trocarAbaMotorista('aba-dash-mot', this)"><i class="bi bi-house-door-fill"></i></button>
       <button class="pill-nav-btn" onclick="trocarAbaMotorista('aba-turno-mot', this)"><i class="bi bi-car-front-fill"></i></button>
       <button class="pill-nav-btn" onclick="trocarAbaMotorista('aba-fotos-mot', this)"><i class="bi bi-camera-fill"></i></button>
+      <button class="pill-nav-btn" title="Manutenção" onclick="trocarAbaMotorista('aba-manutencao-mot', this)"><i class="bi bi-tools"></i></button>
       <button class="pill-nav-btn" onclick="trocarAbaMotorista('aba-relatorio-mot', this)"><i class="bi bi-clock-history"></i></button>
     </div>
   </div>
@@ -865,6 +986,10 @@
     horaEntrada: "07:00",
     horaSaida: "17:30",
     litrosAbastecidos: 12,
+    tipoCombustivel: "Diesel S10",
+    avariaVistoria: "Veículo íntegro / Sem avarias prévias",
+    diarios: [],
+    diasSemViagem: {},
     viagens: [
       {
         id: "V-101",
@@ -1117,12 +1242,28 @@
     persistir();
   }
 
+  function toggleAvariaInicio() {
+    const check = document.getElementById('checkTemAvaria');
+    document.getElementById('boxDetalhesAvaria').classList.toggle('d-none', !check.checked);
+  }
+
   function registrarPontoEntradaMotorista() {
     const km = parseFloat(document.getElementById('inputKmInicial').value);
     if (!km) { alert('Informe o Km Inicial'); return; }
     db.kmInicial = km;
     db.horaEntrada = new Date().toLocaleTimeString('pt-BR');
     document.getElementById('horaEntradaFeedback').innerText = `Entrada às ${db.horaEntrada}`;
+
+    const temAvaria = document.getElementById('checkTemAvaria').checked;
+    if (temAvaria) {
+      const tipo = document.getElementById('avariaTipoSelect').value;
+      const desc = document.getElementById('avariaDescricaoInput').value.trim();
+      db.avariaVistoria = `${tipo}${desc ? ' — ' + desc : ''}`;
+    } else {
+      db.avariaVistoria = 'Veículo íntegro / Sem avarias prévias';
+    }
+    document.getElementById('repAvariaVistoria').innerText = db.avariaVistoria;
+
     persistir();
     recalcularMetricasMotorista();
   }
@@ -1151,6 +1292,10 @@
     document.getElementById('repKmTotal').innerText = `${dist} Km`;
     document.getElementById('repMediaAutonomia').innerText = media > 0 ? `${media} Km/L` : 'Não apurada';
     document.getElementById('repJornadaHoras').innerText = `${db.horaEntrada || '07:00'} às ${db.horaSaida || '17:30'}`;
+
+    const tipoCombustivel = document.getElementById('selectTipoCombustivel');
+    if (tipoCombustivel) db.tipoCombustivel = tipoCombustivel.value;
+    document.getElementById('repTipoCombustivel').innerText = db.tipoCombustivel || '--';
   }
 
   function encerrarTurnoMotorista() {
@@ -1158,9 +1303,113 @@
     if (!kmF) { alert('Informe o Km Final'); return; }
     db.kmFinal = kmF;
     db.horaSaida = new Date().toLocaleTimeString('pt-BR');
+
+    const hoje = new Date().toISOString().split('T')[0];
+    if (!db.diarios) db.diarios = [];
+    db.diarios = db.diarios.filter(d => !(d.motorista === db.usuarioAtivo && d.data === hoje));
+    db.diarios.unshift({
+      motorista: db.usuarioAtivo,
+      data: hoje,
+      veiculo: db.veiculoAtivo,
+      kmInicial: db.kmInicial,
+      kmFinal: db.kmFinal,
+      horaEntrada: db.horaEntrada,
+      horaSaida: db.horaSaida,
+      litros: parseFloat(document.getElementById('inputLitrosAbastece').value) || db.litrosAbastecidos || 0,
+      tipoCombustivel: db.tipoCombustivel,
+      avariaVistoria: db.avariaVistoria
+    });
+
     persistir();
     recalcularMetricasMotorista();
     alert(`Turno finalizado às ${db.horaSaida}! Boletim oficial pronto.`);
+  }
+
+  function salvarManutencaoMotorista() {
+    const veiculo = db.veiculoAtivo;
+    const data = document.getElementById('motManutData').value || new Date().toISOString().split('T')[0];
+    const km = document.getElementById('motManutKm').value;
+    const tipo = document.getElementById('motManutTipo').value;
+    const descricao = document.getElementById('motManutDescricao').value.trim();
+    const valor = parseFloat(document.getElementById('motManutValor').value) || 0;
+    const local = document.getElementById('motManutLocal').value.trim();
+
+    if (!descricao || valor <= 0 || !local) {
+      alert('Preencha a descrição, valor e oficina!');
+      return;
+    }
+
+    db.manutencoes.unshift({
+      veiculo,
+      data,
+      tipo,
+      descricao: km ? `${descricao} (Km ${km})` : descricao,
+      valor,
+      local,
+      autorizador: db.usuarioAtivo
+    });
+
+    persistir();
+    document.getElementById('motManutKm').value = '';
+    document.getElementById('motManutDescricao').value = '';
+    document.getElementById('motManutValor').value = '';
+    document.getElementById('motManutLocal').value = '';
+    alert('Manutenção registrada com sucesso! Os dados foram enviados para a Gestão de Frotas.');
+  }
+
+  function consultarDiarioPorData() {
+    const data = document.getElementById('inputDataConsultaDiario').value;
+    if (!data) { alert('Selecione uma data.'); return; }
+
+    const hoje = new Date().toISOString().split('T')[0];
+    const dataFmt = data.split('-').reverse().join('/');
+    const chave = db.usuarioAtivo + '_' + data;
+
+    if (db.diasSemViagem && db.diasSemViagem[chave]) {
+      document.getElementById('repVeiculoNome').innerText = db.veiculoAtivo;
+      document.getElementById('repJornadaHoras').innerText = 'Sem viagem';
+      document.getElementById('repKmTotal').innerText = '0 Km';
+      document.getElementById('repMediaAutonomia').innerText = '--';
+      document.getElementById('repTipoCombustivel').innerText = '--';
+      document.getElementById('repAvariaVistoria').innerText = '--';
+      document.getElementById('bannerDiarioData').innerText = `${dataFmt}: Dia sem viagem — ${db.diasSemViagem[chave]}`;
+      return;
+    }
+
+    const registro = (db.diarios || []).find(d => d.motorista === db.usuarioAtivo && d.data === data);
+    if (registro) {
+      const dist = Math.max(0, registro.kmFinal - registro.kmInicial);
+      const media = registro.litros > 0 ? (dist / registro.litros).toFixed(2) : 0;
+      document.getElementById('repVeiculoNome').innerText = registro.veiculo;
+      document.getElementById('repJornadaHoras').innerText = `${registro.horaEntrada} às ${registro.horaSaida}`;
+      document.getElementById('repKmTotal').innerText = `${dist} Km`;
+      document.getElementById('repMediaAutonomia').innerText = media > 0 ? `${media} Km/L` : 'Não apurada';
+      document.getElementById('repTipoCombustivel').innerText = registro.tipoCombustivel || '--';
+      document.getElementById('repAvariaVistoria').innerText = registro.avariaVistoria || '--';
+      document.getElementById('bannerDiarioData').innerText = `Exibindo boletim de: ${dataFmt}`;
+    } else if (data === hoje) {
+      recalcularMetricasMotorista();
+      document.getElementById('bannerDiarioData').innerText = 'Exibindo boletim do turno atual.';
+    } else {
+      document.getElementById('repJornadaHoras').innerText = '--';
+      document.getElementById('repKmTotal').innerText = '0 Km';
+      document.getElementById('repMediaAutonomia').innerText = '--';
+      document.getElementById('repTipoCombustivel').innerText = '--';
+      document.getElementById('repAvariaVistoria').innerText = '--';
+      document.getElementById('bannerDiarioData').innerText = `Nenhum registro encontrado para ${dataFmt}.`;
+    }
+  }
+
+  function registrarDiaSemViagem() {
+    const data = document.getElementById('inputDataConsultaDiario').value;
+    if (!data) { alert('Selecione uma data.'); return; }
+
+    const motivo = document.getElementById('selectMotivoSemViagem').value;
+    if (!db.diasSemViagem) db.diasSemViagem = {};
+    db.diasSemViagem[db.usuarioAtivo + '_' + data] = motivo;
+    persistir();
+    alert('Dia sem viagem registrado no diário de bordo!');
+    consultarDiarioPorData();
   }
 
   function processarFotoComCarimbo(event) {

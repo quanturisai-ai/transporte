@@ -20,10 +20,10 @@ Status possíveis: `Pendente`, `Em andamento`, `Concluído`.
 
 2. **Vistoria de avarias no início do turno** — checkbox "possui avaria
    prévia?" com tipo de dano, descrição e foto.
-   Status: Pendente
+   Status: Concluído
 3. **Tipo de combustível no abastecimento** — seleção de Diesel S10 /
    Gasolina / Etanol, além do valor e litros já existentes.
-   Status: Pendente
+   Status: Concluído
 4. **Notificação individual ao paciente via WhatsApp** — botão no card do
    paciente que abre o WhatsApp com mensagem avisando que o veículo iniciou
    o deslocamento.
@@ -41,17 +41,17 @@ Status possíveis: `Pendente`, `Em andamento`, `Concluído`.
 8. **Despertador/alarme de horário** — lembrete simples de horário dentro do
    app.
    Status: Pendente
-9. **Lançamento de manutenção pelo próprio motorista** — hoje só a
-   Gestão/Admin registra manutenção; motorista não lança e isso não
-   alimenta a meta de km do veículo.
-   Status: Pendente
+9. **Lançamento de manutenção pelo próprio motorista** — nova aba
+   "Manutenção" no painel do motorista; os lançamentos entram no mesmo
+   histórico consultado pela Gestão/Admin.
+   Status: Concluído
 10. **Scanner de documentos médicos** — digitalizar guia de encaminhamento,
     laudo, prontuário de ambulância etc. (hoje só existe foto do comprovante
     de embarque).
     Status: Pendente
 11. **Diário de bordo por data (calendário)** — consultar boletins de dias
     passados e registrar "dia sem viagem" com motivo.
-    Status: Pendente
+    Status: Concluído
 12. **Sincronizar com planilha (nuvem)** — ação distinta do download local
     de CSV que já existe hoje.
     Status: Pendente
@@ -71,3 +71,5 @@ Status possíveis: `Pendente`, `Em andamento`, `Concluído`.
 
 - 2026-09-10: Documento criado com o diagnóstico completo.
 - 2026-09-10: Itens 4, 5 e 6 (WhatsApp e rotas) implementados.
+- 2026-09-10: Itens 2, 3, 9 e 11 (vistoria de avarias, tipo de combustível,
+  manutenção pelo motorista e diário de bordo por data) implementados.
